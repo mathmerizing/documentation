@@ -1,0 +1,285 @@
+Basics of Deep Learning
+=======================
+
+Introduction
+^^^^^^^^^^^^
+
+Before we dive into some more advanced concepts in deep learning, let us recapitulate
+the fundamentals. Deep learning is a subset of machine learning, in which neural networks,
+which we will introduce shortly are trying to learn a mapping between samples from a dataset
+and their labels. In the 20th century researchers, inspired by how the human brain works,
+invented the **Artificial Neural Network** (ANN), whose architecture is depicted below.
+Frequently we also refer to this datastructure as a **Multi-Layer Perceptron** (MLP).
+
+.. figure:: img/MLP.svg
+    :alt: multi_layer_perceptron
+    :align: center
+
+    Figure 1: Architecture of a Multi-Layer Perceptron
+
+To create this particular network you need to execute this code:
+
+::
+
+   >>> from nn import MLP
+   >>> from layers import Dense
+   >>> nn = MLP()
+   >>> nn.addLayer(Dense(inputDim = 3, outputDim = 4))
+   >>> nn.addLayer(Dense(inputDim = 4, outputDim = 2))
+
+As you can see, you simply need to create a new MLP object and add the two dense layers
+by specifying the number of neurons in the input layer and the number of neurons in
+the output layer.
+
+How can we compute the prediction of the neural network, given some sample
+from the dataset? In the following, we will answer this question for the case,
+in which subsequent layers of neurons are fully connected. These are the so called **dense layers**.
+For more sophisticated architectures and layer types, please go to the corresponding
+chapters.
+
+In the simplest, case a Multi-Layer Perceptron only has **weights** and **biases**
+for each dense layer. Let us number these parameters from left to right,
+i.e. :math:`W^1` (resp. :math:`b^1`) denotes the weights (biases)
+between the red and the blue layer and :math:`W^2` (resp. :math:`b^2`) denotes the weights (biases)
+between the blue and the green layer. Then the prediction of the neural network is given
+by
+
+.. math::
+
+   W^2\left(W^1x + b^1\right) + b^2
+
+for some input vector :math:`x`, since the i.th dense layer acts on an input vector :math:`x^i` by
+
+.. math::
+
+  W^ix^i + b^i
+
+and we have :math:`x^1 := x`. The process of evaluating the prediction of a neural network,
+is called **forward propagation**, since an input vector is propagated through all
+subsequent layers of a neural network.
+
+Activation functions
+^^^^^^^^^^^^^^^^^^^^
+In general, the dense layers are not sufficient the way that they have been presented above,
+since they don't contain any nonlinearities. Thus various **activation functions σ**
+have been introduced, which are applied to the output of a given dense layer, i.e.
+the i.th dense layer acts on an input vector :math:`x^i` by
+
+.. math::
+
+  \sigma\left( W^ix^i + b^i \right).
+
+Which activation functions are there and which are suitable for my problem statement?
+There is a vast array of activation functions which have been developed by researchers,
+but we will only present you some of the most prominent examples, which have been also
+incorporated into our framework. The choice of activation function is somewhat of an art itself,
+but we would advise to try out the Sigmoid or ReLU function at first, since they have
+proven to be quite useful in practice.
+
+In our framework we have implemented the functions:
+
+Identity
+--------
+The identity function :math:`f(x) = x` is rarely used in practice, since it is linear.
+
+::
+
+   >>> from activations import Identity
+   >>> f = Identity()
+
+Sigmoid
+-------
+The sigmoid function has been inspired by the neurons in our brain:
+
+.. math::
+
+   \sigma(x) := \frac{1}{1 + e^{-x}}.
+
+Neurons in the brain are either active, i.e. they fire, which is represented by a 1,
+or they are inactive, which is represented by a 0. Thus, the sigmoid function tries
+to emulate the function of a brain's neuron, since for positive inputs the function's value is close to 1
+and for negative inputs it is close to 0.
+
+.. figure:: img/Sigmoid.svg
+    :alt: sigmoid
+    :align: center
+
+    Figure 2: Sigmoid function
+
+Why don't we use a step function, like the Heaviside function :math:`f` with
+
+.. math::
+   f(x) :=
+   \begin{cases}
+      0 & \text{for } x \leq 0 \\
+      1 & \text{for } x  > 0\\
+   \end{cases} \quad ?
+
+Firstly, this function doesn't have a derivative in the strong sense.
+Secondly, the variational derivative is 0 for :math:`\mathbb{R} \setminus \{ 0\}`,
+which would prevent the learning of parameters when applying backpropagation.
+Hence we use the sigmoid function instead.
+
+::
+
+   >>> from activations import Sigmoid
+   >>> f = Sigmoid()
+
+Tanh
+----
+Similar arguments to the ones presented above can be used to motivate the usage
+of the hyperbolic tangent
+
+.. math::
+
+   \tanh(x) := \frac{\sinh(x)}{\cosh(x)},
+
+where :math:`\sinh(x) = \frac{e^x - e^{-x}}{2}` is the hyperbolic sine
+and :math:`\cosh(x) = \frac{e^x + e^{-x}}{2}` is the hyperbolic cosine.
+
+.. figure:: img/Tanh.svg
+    :alt: tanh
+    :align: center
+
+    Figure 3: Hyperbolic tangent
+
+A major difference between the sigmoid and the tanh function is that for :math:`x \leq 0` the
+activation function is now approximately -1. The hyperbolic tangent is used for example
+for LSTMs, which are a type of Recurrent Neural Network (RNN).
+
+::
+
+   >>> from activations import Tanh
+   >>> f = Tanh()
+
+ReLU
+----
+Although the previous functions were continously differentiable, they were costly
+to compute, since sigmoid and hyperbolic tangent require the evaluation of the
+exponential function. Thus data scientist choose to work with the Rectified Linear Unit (ReLU)
+
+.. math::
+   \text{relu}(x) := \max(0,x)
+
+and its variations very often.
+
+.. figure:: img/ReLU.svg
+    :alt: relu
+    :align: center
+
+    Figure 4: Rectified Linear Unit
+
+Unfortunately the disadvantages of this simple activation function are that the function
+is not continously differentiable at 0 and that the slope of the function vanishes
+for :math:`x < 0`. These disadvantages can be eliminated by using the exponential
+linear unit (ELU) with
+
+.. math::
+   f(x) :=
+   \begin{cases}
+      x & \text{for } x \geq 0 \\
+      e^x - 1 & \text{for } x  < 0\\
+   \end{cases} \quad .
+
+However, we haven't implemented this function in our framework, since it also requires
+the evaluation of the exponential function. If we don't want the gradient to vanish
+for negative inputs, we can alternatively use Leaky ReLU.
+
+::
+
+   >>> from activations import ReLU
+   >>> f = ReLU()
+
+Leaky ReLU
+----------
+The Leaky Rectified Linear Unit (Leaky ReLU) differs from ReLU only by its function values for negative inputs.
+
+.. math::
+   \text{leaky_relu}(x) := \max(\varepsilon x,x) \text{ with } \varepsilon \ll 1
+
+Namely Leaky ReLU is weakly linear for :math:`x < 0`, instead of being 0 like ReLU.
+
+.. figure:: img/LeakyReLU.svg
+    :alt: leaky_relu
+    :align: center
+
+    Figure 5: Leaky Rectified Linear Unit
+
+::
+
+   >>> from activations import LeakyReLU
+   >>> f = LeakyReLU(epsilon = 0.01)
+
+Softmax
+-------
+The Softmax function is used in the output layer of the network to yield a probability
+distribution over the different classes, e.g. when trying to classify whether
+there is a cat or dog in the picture we would like to know how certain the network
+is about its prediction. That is we would like some output like:
+
+* :math:`\mathbb{P}(\text{"dog"}) = 80 \%`
+* :math:`\mathbb{P}(\text{"cat"}) = 20 \%`
+
+This type of prediction can be achieved with the formula
+
+.. math::
+
+   \text{softmax}(x_i) := \frac{e^{x_i}}{\sum_{j=1}^n e^{x_j}}.
+
+::
+
+   >>> from activations import Softmax
+   >>> f = Softmax()
+
+.. tip::
+
+  Activation functions can also be added to dense layers. If no activation function is
+  specified, the layer uses the Sigmoid function. E.g. you can add ReLU to a dense layer via
+
+  ::
+
+     >>> from layers import Dense
+     >>> from activations import ReLU
+     >>> denseLayer = Dense(inputDim = 3, outputDim = 4, activation = ReLU())
+
+Loss functions
+^^^^^^^^^^^^^^
+Now that we have established how the output of a neural network can be computed,
+we need to define a minimization problem, such that we can tweak the parameters of
+our neural network. For that purpose, we need the so called loss function which
+we are minimizing. The loss function is supposed to be an indicator for the quality
+of the neural network and depending on the function we choose, we get different results.
+
+In our framework we have implemented the loss functions:
+
+Mean Squared Error
+------------------
+The Mean Squared Error (MSE) describes the :math:`L^2`-error between the predictions of
+the neural network and the expected outputs. TO DO !!!
+
+.. math::
+
+   \text{MSE}(X;W,b) := \frac{1}{2|X|} \sum_{x \in X} ||NN(x;W,b) - y(x)||^2
+
+
+Crossentropy
+------------
+
+Optimizers
+^^^^^^^^^^
+TO DO
+
+Dataset
+^^^^^^^
+TO DO
+
+Code: Training a Classifier
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TODO: description
+::
+
+   >>> from nn import MLP
+   >>> from layers import Dense
+   >>> classifier = MLP()
+   >>> optimizer = Adam(0.1)
+   >>> ...

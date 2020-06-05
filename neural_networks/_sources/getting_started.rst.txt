@@ -1,0 +1,35 @@
+Getting started: Overview & Installation
+========================================
+
+Overview
+^^^^^^^^
+TODO...
+
+Installation guide
+^^^^^^^^^^^^^^^^^^
+Clone repository: TODO...
+
+Install requirements: 
+*********************
+Open a terminal in the repository folder and execute ::
+
+    pip install -r requirements.txt
+
+.. note::
+
+   Please let us know, if we forgot to list some dependencies or if you have any problems with the installation.
+
+Build documentation:
+********************
+Building the documentation yourself is not necessary, since we have already done that for you.
+If you still want to do that, follow these steps:
+
+1. If you added some files, navigate to the folder ``documentation`` and run ::
+
+     sphinx-apidoc --separate -a -o ./source ..
+
+2. Then go to the folder ``documentation`` and execute the command ::
+
+     make clean html
+
+The documentation is now built and can be viewed by opening ``documentation/build/html/index.html``.

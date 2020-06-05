@@ -1,0 +1,7 @@
+NumNeurNet.visualization module
+===============================
+
+.. automodule:: NumNeurNet.visualization
+   :members:
+   :undoc-members:
+   :show-inheritance:

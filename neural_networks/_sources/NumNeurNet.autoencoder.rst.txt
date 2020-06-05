@@ -1,0 +1,7 @@
+NumNeurNet.autoencoder module
+=============================
+
+.. automodule:: NumNeurNet.autoencoder
+   :members:
+   :undoc-members:
+   :show-inheritance:

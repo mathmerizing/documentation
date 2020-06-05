@@ -1,0 +1,7 @@
+NumNeurNet.activations module
+=============================
+
+.. automodule:: NumNeurNet.activations
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,48 @@
+.. DeepNumerics documentation master file, created by
+   sphinx-quickstart on Fri Apr 24 23:21:35 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to NumNeurNet's documentation!
+======================================
+This is a neural networks from scratch library which has been created for the course
+"Numerical methods of algorithmic systems and neural networks" which has been taught
+in the summer semester 2020 at the Leibniz Universität Hannover by Prof. Thomas Wick.
+
+Some simple head
+================
+
+Informative description ::
+
+    print("hello")
+    >> hello
+
+Quickstart Guide
+^^^^^^^^^^^^^^^^
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Basics:
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   getting_started
+   basics
+   classifier_demo.ipynb
+   autoencoder_demo.ipynb
+   modules
+   TBA 
+   license
+   help
+
+
+
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

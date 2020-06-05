@@ -1,0 +1,7 @@
+NumNeurNet.progressbar module
+=============================
+
+.. automodule:: NumNeurNet.progressbar
+   :members:
+   :undoc-members:
+   :show-inheritance:

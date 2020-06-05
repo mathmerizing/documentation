@@ -1,0 +1,422 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>NumNeurNet.activations module &mdash; DeepNumerics 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NumNeurNet.autoencoder module" href="NumNeurNet.autoencoder.html" />
+    <link rel="prev" title="NumNeurNet package" href="NumNeurNet.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> DeepNumerics
+          
+
+          
+            
+            <img src="_static/autoencoder.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started: Overview &amp; Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics.html">Basics of Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_demo.html">Multi-Layer Perceptron: Classification of handwritten digits (MNIST)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoencoder_demo.html">Denoising Autoencoder: Removing noise from the MNIST dataset</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">NumNeurNet</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="NumNeurNet.html">NumNeurNet package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="NumNeurNet.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">NumNeurNet.activations module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.autoencoder.html">NumNeurNet.autoencoder module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.dataset.html">NumNeurNet.dataset module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.layers.html">NumNeurNet.layers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.loss.html">NumNeurNet.loss module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.my_utils.html">NumNeurNet.my_utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.nn.html">NumNeurNet.nn module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.optimizer.html">NumNeurNet.optimizer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.progressbar.html">NumNeurNet.progressbar module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="NumNeurNet.visualization.html">NumNeurNet.visualization module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="NumNeurNet.html#module-NumNeurNet">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="TBA.html">TBA</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DeepNumerics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">NumNeurNet</a> &raquo;</li>
+        
+          <li><a href="NumNeurNet.html">NumNeurNet package</a> &raquo;</li>
+        
+      <li>NumNeurNet.activations module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/NumNeurNet.activations.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-NumNeurNet.activations">
+<span id="numneurnet-activations-module"></span><h1>NumNeurNet.activations module<a class="headerlink" href="#module-NumNeurNet.activations" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="NumNeurNet.activations.Activation">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.activations.</code><code class="sig-name descname">Activation</code><a class="headerlink" href="#NumNeurNet.activations.Activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>An abstract class which represents activation functions which can be applied
+to a layer in a neural network.</p>
+<dl class="py method">
+<dt id="NumNeurNet.activations.Activation.apply">
+<em class="property">abstract </em><code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Activation.apply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate activation function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.Activation.derivative">
+<em class="property">abstract </em><code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Activation.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate derivative of activation function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.Activation.funcFromStr">
+<em class="property">static </em><code class="sig-name descname">funcFromStr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Activation.funcFromStr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="NumNeurNet.activations.Identity">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.activations.</code><code class="sig-name descname">Identity</code><a class="headerlink" href="#NumNeurNet.activations.Identity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.activations.Activation" title="NumNeurNet.activations.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.activations.Activation</span></code></a></p>
+<p>Identity function</p>
+<dl class="py method">
+<dt id="NumNeurNet.activations.Identity.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Identity.apply" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[f(x) := x\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.Identity.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Identity.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[f'(x) := 1\]</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="NumNeurNet.activations.LeakyReLU">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.activations.</code><code class="sig-name descname">LeakyReLU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">epsilon</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.LeakyReLU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.activations.Activation" title="NumNeurNet.activations.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.activations.Activation</span></code></a></p>
+<img alt="leaky_relu" class="align-center" src="_images/LeakyReLU.svg" /><dl class="py method">
+<dt id="NumNeurNet.activations.LeakyReLU.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.LeakyReLU.apply" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\text{leaky_relu}(x) := \max(\varepsilon x,x) \text{ with } \varepsilon \ll 1\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.LeakyReLU.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.LeakyReLU.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\begin{split}\text{leaky_relu}'(x) :=
+\begin{cases}
+    \varepsilon &amp; \text{for } x \leq 0 \\
+    1 &amp; \text{else} \\
+\end{cases}\end{split}\]</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="NumNeurNet.activations.LeakyReLU.epsilon">
+<code class="sig-name descname">epsilon</code><em class="property"> = 0</em><a class="headerlink" href="#NumNeurNet.activations.LeakyReLU.epsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="NumNeurNet.activations.ReLU">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.activations.</code><code class="sig-name descname">ReLU</code><a class="headerlink" href="#NumNeurNet.activations.ReLU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.activations.Activation" title="NumNeurNet.activations.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.activations.Activation</span></code></a></p>
+<img alt="relu" class="align-center" src="_images/ReLU.svg" /><dl class="py method">
+<dt id="NumNeurNet.activations.ReLU.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.ReLU.apply" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\text{relu}(x) := \max(0,x)\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.ReLU.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.ReLU.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\begin{split}\text{relu}'(x) :=
+\begin{cases}
+    0 &amp; \text{for } x \leq 0 \\
+    1 &amp; \text{else} \\
+\end{cases}\end{split}\]</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="NumNeurNet.activations.Sigmoid">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.activations.</code><code class="sig-name descname">Sigmoid</code><a class="headerlink" href="#NumNeurNet.activations.Sigmoid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.activations.Activation" title="NumNeurNet.activations.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.activations.Activation</span></code></a></p>
+<img alt="sigmoid" class="align-center" src="_images/Sigmoid.svg" /><dl class="py method">
+<dt id="NumNeurNet.activations.Sigmoid.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Sigmoid.apply" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\sigma(x) := \frac{1}{1 + \exp(-x)}\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.Sigmoid.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Sigmoid.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\sigma '(x) :=\sigma(x) \cdot (1 - \sigma(x))\]</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="NumNeurNet.activations.Softmax">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.activations.</code><code class="sig-name descname">Softmax</code><a class="headerlink" href="#NumNeurNet.activations.Softmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.activations.Activation" title="NumNeurNet.activations.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.activations.Activation</span></code></a></p>
+<p>Softmax function</p>
+<dl class="py method">
+<dt id="NumNeurNet.activations.Softmax.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Softmax.apply" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\text{softmax}(x_i) := \frac{\exp(x_i)}{\sum_{j=1}^n \exp(x_j)}\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.Softmax.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Softmax.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate derivative of activation function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="NumNeurNet.activations.Tanh">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.activations.</code><code class="sig-name descname">Tanh</code><a class="headerlink" href="#NumNeurNet.activations.Tanh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.activations.Activation" title="NumNeurNet.activations.Activation"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.activations.Activation</span></code></a></p>
+<img alt="tanh" class="align-center" src="_images/Tanh.svg" /><dl class="py method">
+<dt id="NumNeurNet.activations.Tanh.apply">
+<code class="sig-name descname">apply</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Tanh.apply" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\tanh(x) := \frac{\sinh(x)}{\cosh(x)}\]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.activations.Tanh.derivative">
+<code class="sig-name descname">derivative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.activations.Tanh.derivative" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math notranslate nohighlight">
+\[\tanh'(x) := 1 - \tanh^2(x)\]</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="NumNeurNet.autoencoder.html" class="btn btn-neutral float-right" title="NumNeurNet.autoencoder module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="NumNeurNet.html" class="btn btn-neutral float-left" title="NumNeurNet package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Annika Heil, Max Schröder, Yerso Checya Sinti, Julian Roth
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

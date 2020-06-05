@@ -1,0 +1,7 @@
+NumNeurNet.layers module
+========================
+
+.. automodule:: NumNeurNet.layers
+   :members:
+   :undoc-members:
+   :show-inheritance:

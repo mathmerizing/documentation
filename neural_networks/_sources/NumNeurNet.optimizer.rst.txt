@@ -1,0 +1,7 @@
+NumNeurNet.optimizer module
+===========================
+
+.. automodule:: NumNeurNet.optimizer
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+NumNeurNet.my\_utils module
+===========================
+
+.. automodule:: NumNeurNet.my_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

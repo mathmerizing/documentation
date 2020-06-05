@@ -1,0 +1,7 @@
+NumNeurNet.dataset module
+=========================
+
+.. automodule:: NumNeurNet.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
