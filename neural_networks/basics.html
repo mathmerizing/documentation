@@ -17,25 +17,25 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <script type="text/javascript" src="static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+        <script src="static/jquery.js"></script>
+        <script src="static/underscore.js"></script>
+        <script src="static/doctools.js"></script>
+        <script src="static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
     
-    <script type="text/javascript" src="_static/js/theme.js"></script>
+    <script type="text/javascript" src="static/js/theme.js"></script>
 
     
 
   
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Multi-Layer Perceptron: Classification of handwritten digits (MNIST)" href="classifier_demo.html" />
@@ -58,7 +58,7 @@
 
           
             
-            <img src="_static/autoencoder.svg" class="logo" alt="Logo"/>
+            <img src="static/autoencoder.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -167,7 +167,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/basics.rst.txt" rel="nofollow"> View page source</a>
+            <a href="sources/basics.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -215,7 +215,7 @@ and their labels. In the 20th century researchers, inspired by how the human bra
 invented the <strong>Artificial Neural Network</strong> (ANN), whose architecture is depicted below.
 Frequently we also refer to this datastructure as a <strong>Multi-Layer Perceptron</strong> (MLP).</p>
 <div class="figure align-center" id="id1">
-<img alt="multi_layer_perceptron" src="_images/MLP.svg" /><p class="caption"><span class="caption-text">Figure 1: Architecture of a Multi-Layer Perceptron</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+<img alt="multi_layer_perceptron" src="images/MLP.svg" /><p class="caption"><span class="caption-text">Figure 1: Architecture of a Multi-Layer Perceptron</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
 </div>
 <p>To create this particular network you need to execute this code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">nn</span> <span class="kn">import</span> <span class="n">MLP</span>
@@ -281,7 +281,7 @@ or they are inactive, which is represented by a 0. Thus, the sigmoid function tr
 to emulate the function of a brain’s neuron, since for positive inputs the function’s value is close to 1
 and for negative inputs it is close to 0.</p>
 <div class="figure align-center" id="id2">
-<img alt="sigmoid" src="_images/Sigmoid.svg" /><p class="caption"><span class="caption-text">Figure 2: Sigmoid function</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<img alt="sigmoid" src="images/Sigmoid.svg" /><p class="caption"><span class="caption-text">Figure 2: Sigmoid function</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
 <p>Why don’t we use a step function, like the Heaviside function <span class="math notranslate nohighlight">\(f\)</span> with</p>
 <div class="math notranslate nohighlight">
@@ -308,7 +308,7 @@ of the hyperbolic tangent</p>
 <p>where <span class="math notranslate nohighlight">\(\sinh(x) = \frac{e^x - e^{-x}}{2}\)</span> is the hyperbolic sine
 and <span class="math notranslate nohighlight">\(\cosh(x) = \frac{e^x + e^{-x}}{2}\)</span> is the hyperbolic cosine.</p>
 <div class="figure align-center" id="id3">
-<img alt="tanh" src="_images/Tanh.svg" /><p class="caption"><span class="caption-text">Figure 3: Hyperbolic tangent</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<img alt="tanh" src="images/Tanh.svg" /><p class="caption"><span class="caption-text">Figure 3: Hyperbolic tangent</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
 </div>
 <p>A major difference between the sigmoid and the tanh function is that for <span class="math notranslate nohighlight">\(x \leq 0\)</span> the
 activation function is now approximately -1. The hyperbolic tangent is used for example
@@ -327,7 +327,7 @@ exponential function. Thus data scientist choose to work with the Rectified Line
 \[\text{relu}(x) := \max(0,x)\]</div>
 <p>and its variations very often.</p>
 <div class="figure align-center" id="id4">
-<img alt="relu" src="_images/ReLU.svg" /><p class="caption"><span class="caption-text">Figure 4: Rectified Linear Unit</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<img alt="relu" src="images/ReLU.svg" /><p class="caption"><span class="caption-text">Figure 4: Rectified Linear Unit</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
 </div>
 <p>Unfortunately the disadvantages of this simple activation function are that the function
 is not continously differentiable at 0 and that the slope of the function vanishes
@@ -354,7 +354,7 @@ for negative inputs, we can alternatively use Leaky ReLU.</p>
 \[\text{leaky_relu}(x) := \max(\varepsilon x,x) \text{ with } \varepsilon \ll 1\]</div>
 <p>Namely Leaky ReLU is weakly linear for <span class="math notranslate nohighlight">\(x &lt; 0\)</span>, instead of being 0 like ReLU.</p>
 <div class="figure align-center" id="id5">
-<img alt="leaky_relu" src="_images/LeakyReLU.svg" /><p class="caption"><span class="caption-text">Figure 5: Leaky Rectified Linear Unit</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+<img alt="leaky_relu" src="images/LeakyReLU.svg" /><p class="caption"><span class="caption-text">Figure 5: Leaky Rectified Linear Unit</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">activations</span> <span class="kn">import</span> <span class="n">LeakyReLU</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">LeakyReLU</span><span class="p">(</span><span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span>
