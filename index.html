@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Julian Roth</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css'>
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script>
+<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js'></script>
+<style>
+</style></head>
+<body>
+<center><h1 style='font-family: Comic Sans MS, cursive, sans-serif;'>Documentation</h1></center><br>
+<div class='panel-group' style='margin-left: 20%; margin-right: 20%;'>
+	<div class='panel panel-default'>
+		<div class='panel-heading'>
+			<h4 class='panel-title'>
+				<a data-toggle='collapse' data-parent='#accordion' href='#collapsemultigrid'><span class='toggle-icon glyphicon glyphicon-chevron-right' style = 'margin-right: 10px'></span></a>
+				<a href='./multigrid'>Multigrid from Scratch</a>
+			</h4>
+		</div>
+		<div id='collapsemultigrid' class='panel-collapse collapse out'>
+			<div class='panel-body'>
+				<i>Multiple grids, PDE, etc. (todo: add description)</i><br>
+				<a href='./multigrid'>Full Documentation</a>
+			</div>
+		</div>
+	</div>
+	<div class='panel panel-default'>
+		<div class='panel-heading'>
+			<h4 class='panel-title'>
+				<a data-toggle='collapse' data-parent='#accordion' href='#collapseneuralnetworks'><span class='toggle-icon glyphicon glyphicon-chevron-right' style = 'margin-right: 10px'></span></a>
+				<a href='./neural_networks'>Neural Networks from Scratch</a>
+			</h4>
+		</div>
+		<div id='collapseneuralnetworks' class='panel-collapse collapse out'>
+			<div class='panel-body'>
+				<i>NN, autoencoder, etc. (todo: add description)</i><br>
+				<a href='./neural_networks'>Full Documentation</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type='text/javascript'>
+$(document).ready(function () {
+$('a[data-toggle="collapse"]').click(function () {
+$(this).find('span.toggle-icon').toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
+})
+})
+</script>
+</body>
+</html>
