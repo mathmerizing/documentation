@@ -58,7 +58,7 @@
 
           
             
-            <img src="static/autoencoder.svg" class="logo" alt="Logo"/>
+            <img src="static/MLP.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -86,7 +86,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Table of Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started: Overview &amp; Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="basics.html">Basics of Deep Learning</a></li>
@@ -112,7 +112,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="TBA.html">TBA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
 </ul>
@@ -210,17 +209,6 @@
 <div class="section" id="module-NumNeurNet.optimizer">
 <span id="numneurnet-optimizer-module"></span><h1>NumNeurNet.optimizer module<a class="headerlink" href="#module-NumNeurNet.optimizer" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
-<dt id="NumNeurNet.optimizer.Adagrad">
-<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.optimizer.</code><code class="sig-name descname">Adagrad</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">learningRate</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.Adagrad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.optimizer.Optimizer" title="NumNeurNet.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.optimizer.Optimizer</span></code></a></p>
-<dl class="py method">
-<dt id="NumNeurNet.optimizer.Adagrad.optimize">
-<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">variableGradient</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.Adagrad.optimize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt id="NumNeurNet.optimizer.Adam">
 <em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.optimizer.</code><code class="sig-name descname">Adam</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">learningRate</span><span class="o">=</span><span class="default_value">0.001</span></em>, <em class="sig-param"><span class="n">beta_1</span><span class="o">=</span><span class="default_value">0.9</span></em>, <em class="sig-param"><span class="n">beta_2</span><span class="o">=</span><span class="default_value">0.999</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.Adam" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#NumNeurNet.optimizer.Optimizer" title="NumNeurNet.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.optimizer.Optimizer</span></code></a></p>
@@ -264,17 +252,6 @@ to the output layer in a neural network.</p>
 <dl class="py method">
 <dt id="NumNeurNet.optimizer.Optimizer.setLearningFactor">
 <code class="sig-name descname">setLearningFactor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batchSize</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.Optimizer.setLearningFactor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt id="NumNeurNet.optimizer.RMSprop">
-<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.optimizer.</code><code class="sig-name descname">RMSprop</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">learningRate</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">rho</span><span class="o">=</span><span class="default_value">0.9</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.RMSprop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.optimizer.Optimizer" title="NumNeurNet.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.optimizer.Optimizer</span></code></a></p>
-<dl class="py method">
-<dt id="NumNeurNet.optimizer.RMSprop.optimize">
-<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">variableGradient</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.RMSprop.optimize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -328,7 +305,7 @@ learns.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Annika Heil, Max Schröder, Yerso Checya Sinti, Julian Roth
+        &copy; Copyright 2020, Julian Roth, Max Schröder, Annika Heil, Yerso Checya Sinti
 
     </p>
   </div>

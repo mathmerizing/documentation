@@ -9,31 +9,15 @@ This is a neural networks from scratch library which has been created for the co
 "Numerical methods of algorithmic systems and neural networks" which has been taught
 in the summer semester 2020 at the Leibniz Universität Hannover by Prof. Thomas Wick.
 
-Some simple head
-================
-
-Informative description ::
-
-    print("hello")
-    >> hello
-
-Quickstart Guide
-^^^^^^^^^^^^^^^^
-
 .. toctree::
    :maxdepth: 2
-   :caption: Basics:
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :caption: Table of Contents:
 
    getting_started
    basics
    classifier_demo.ipynb
    autoencoder_demo.ipynb
    modules
-   TBA 
    license
    help
 

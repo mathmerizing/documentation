@@ -58,7 +58,7 @@
 
           
             
-            <img src="static/autoencoder.svg" class="logo" alt="Logo"/>
+            <img src="static/MLP.svg" class="logo" alt="Logo"/>
           
           </a>
 
@@ -86,7 +86,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Table of Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started: Overview &amp; Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="basics.html">Basics of Deep Learning</a></li>
@@ -112,7 +112,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="TBA.html">TBA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
 </ul>
@@ -210,13 +209,56 @@
 <div class="section" id="module-NumNeurNet.layers">
 <span id="numneurnet-layers-module"></span><h1>NumNeurNet.layers module<a class="headerlink" href="#module-NumNeurNet.layers" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
+<dt id="NumNeurNet.layers.Conv2D">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.layers.</code><code class="sig-name descname">Conv2D</code><span class="sig-paren">(</span><em class="sig-param">inputShape=(1</em>, <em class="sig-param">1</em>, <em class="sig-param">1)</em>, <em class="sig-param">filterNumber=1</em>, <em class="sig-param">filterShape=(2</em>, <em class="sig-param">2)</em>, <em class="sig-param">stride=1</em>, <em class="sig-param">padding='same'</em>, <em class="sig-param">activation=&lt;activations.Sigmoid object&gt;</em>, <em class="sig-param">optimizer=&lt;optimizer.Adam object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Conv2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.layers.Layer" title="NumNeurNet.layers.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.layers.Layer</span></code></a></p>
+<p>Convolution Layer: apply filter.</p>
+<p>Resource: <a class="reference external" href="https://cs231n.github.io/convolutional-networks/">https://cs231n.github.io/convolutional-networks/</a></p>
+<dl class="py method">
+<dt id="NumNeurNet.layers.Conv2D.backward">
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lastGradient</span></em>, <em class="sig-param"><span class="n">outputLayer</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Conv2D.backward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Backward propagate the gradient through the layer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.layers.Conv2D.feedforward">
+<code class="sig-name descname">feedforward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Conv2D.feedforward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward propagate the input through the layer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.layers.Conv2D.load">
+<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Conv2D.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a layer from a given folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.layers.Conv2D.numParameters">
+<code class="sig-name descname">numParameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Conv2D.numParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of pararameters in this layer.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.layers.Conv2D.save">
+<code class="sig-name descname">save</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Conv2D.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save layer in a given folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="NumNeurNet.layers.Conv2D.setBatchSize">
+<code class="sig-name descname">setBatchSize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batchSize</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Conv2D.setBatchSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="NumNeurNet.layers.Dense">
 <em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.layers.</code><code class="sig-name descname">Dense</code><span class="sig-paren">(</span><em class="sig-param">inputDim=1</em>, <em class="sig-param">outputDim=1</em>, <em class="sig-param">activation=&lt;activations.Sigmoid object&gt;</em>, <em class="sig-param">optimizer=&lt;optimizer.Adam object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Dense" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#NumNeurNet.layers.Layer" title="NumNeurNet.layers.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.layers.Layer</span></code></a></p>
 <p>Dense Layer: input and output layer are fully connected.</p>
 <dl class="py method">
 <dt id="NumNeurNet.layers.Dense.backward">
-<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lastGradient</span></em>, <em class="sig-param"><span class="n">outputLayer</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Dense.backward" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">backward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lastGradient</span></em>, <em class="sig-param"><span class="n">outputLayer</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">updateParameters</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Dense.backward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Backward propagate the gradient through the layer.</p>
 </dd></dl>
 
@@ -249,6 +291,12 @@
 <code class="sig-name descname">setBatchSize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">batchSize</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.Dense.setBatchSize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt id="NumNeurNet.layers.Flatten">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.layers.</code><code class="sig-name descname">Flatten</code><a class="headerlink" href="#NumNeurNet.layers.Flatten" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.layers.Layer" title="NumNeurNet.layers.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.layers.Layer</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
@@ -289,6 +337,22 @@ which make up a neural network.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="NumNeurNet.layers.MaxPool2D">
+<em class="property">class </em><code class="sig-prename descclassname">NumNeurNet.layers.</code><code class="sig-name descname">MaxPool2D</code><a class="headerlink" href="#NumNeurNet.layers.MaxPool2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#NumNeurNet.layers.Layer" title="NumNeurNet.layers.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.layers.Layer</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="NumNeurNet.layers.calculatePadding">
+<code class="sig-prename descclassname">NumNeurNet.layers.</code><code class="sig-name descname">calculatePadding</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filterHeight</span></em>, <em class="sig-param"><span class="n">filterWidth</span></em>, <em class="sig-param"><span class="n">stride</span></em>, <em class="sig-param"><span class="n">paddingType</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.calculatePadding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="NumNeurNet.layers.convolve">
+<code class="sig-prename descclassname">NumNeurNet.layers.</code><code class="sig-name descname">convolve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em>, <em class="sig-param"><span class="n">filter</span></em>, <em class="sig-param"><span class="n">stride</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.layers.convolve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -311,7 +375,7 @@ which make up a neural network.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2020, Annika Heil, Max Schröder, Yerso Checya Sinti, Julian Roth
+        &copy; Copyright 2020, Julian Roth, Max Schröder, Annika Heil, Yerso Checya Sinti
 
     </p>
   </div>
