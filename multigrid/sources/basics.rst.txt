@@ -1,0 +1,478 @@
+Basics of Geometric Multigrid
+=============================
+
+.. raw:: html
+
+    <style> .blue {color:#3636eb;} </style>
+
+.. role:: blue
+
+.. raw:: html
+
+    <style> .red {color:#cc0000;} </style>
+
+.. role:: red
+
+
+Introduction
+^^^^^^^^^^^^
+In the following, we are describing the :blue:`geometric multigrid method`,
+which for certain problems yields an iterative solver
+with optimal time complexity, i.e. the solver returns a solution to a PDE in
+:math:`O(n_{\text{DoFs}})` arithmetic operations. We will show that this can also
+be achieved for some convection-diffusion equations on uniformly refined triangular
+meshes, when discretizing with linear finite elements.
+
+Problem setup
+^^^^^^^^^^^^^
+Let :math:`\Omega := (-1,1)^2 \setminus (0,1)^2` be an L-shaped :blue:`domain`. We decompose the boundary of this domain :math:`\partial\Omega` into the Neumann boundary :math:`\Gamma_N := (0,1) \times \{0\} \cup \{0\} \times (0,1)`
+and the Dirichlet boundary :math:`\Gamma_D := \partial\Omega \setminus \Gamma_N`.
+
+Next, we define the :blue:`ansatz` and :blue:`test function space` :math:`V := \left\{ u \in H^1(\Omega)\mid u = 0 \text{ on } \Gamma_D \right\}`,
+where
+
+.. math::
+
+  H^1(\Omega) := W^{1,2}(\Omega) := \left\{ u \in L^2(\Omega) \mid \nabla u \in L^2( \Omega ) \right\}
+
+is the Sobolev space containing the weakly differentiable functions
+in :math:`\Omega`. Note that we haven't explicitly prescribed any boundary conditions on :math:`\Gamma_N` in the function space,
+since the homogeneous Neumann boundary conditions come up naturally when deriving the variational form of the problem.
+Further, we need a right hand side function
+
+.. math::
+
+   f(x) :=
+   \begin{cases}
+      -1 & \text{for } x \in (-1,0) \times (0,1) \\
+      0 & \text{for } x \in (-1,0) \times (-1,0) \\
+      1 & \text{for } x \in (0,1) \times (-1,0) \\
+   \end{cases}.
+
+
+.. figure:: img/domain.svg
+    :alt: domain
+    :align: center
+
+.. centered:: Figure 1: Domain :math:`\Omega`
+
+Using the parameters :math:`a = 1` and :math:`c = 0` in :math:`\Omega`, we can now
+formulate the strong form of our convection diffusion equation:
+
+.. admonition:: Strong form
+
+  Find :math:`u: \Omega \rightarrow \mathbb{R}` such that
+
+  .. math::
+
+    -\nabla \cdot \left( a \nabla u\right) + c u &= f \quad \text{in } \Omega \qquad (1)\\
+    u &= 0 \quad \text{on } \Gamma_D \\
+    \partial_n u &= 0 \quad \text{on } \Gamma_N
+
+In the above formulation, we used the notation :math:`\partial n := \nabla \cdot n`.
+To be able to solve this problem, we need to convert it into its integral form.
+Therefore we multiply (1) from the right with a test function :math:`v \in V` and integrate over :math:`\Omega`.
+
+.. math::
+
+   -\int_{\Omega} \left(\nabla \cdot \left( a \nabla u\right)\right) \cdot v\ dx
+   + \int_{\Omega} c u \cdot v\ dx
+   = \int_{\Omega} f \cdot v\ dx \quad \forall v \in V
+
+Now integration of parts can be applied to the first integral and we use the fact that :math:`\partial \Omega = \Gamma_D\ \dot\cup\ \Gamma_N`.
+
+.. math::
+
+   \int_{\Omega} a \nabla u \cdot \nabla v\ dx
+   -\int_{\Gamma_D} a \partial_n u \cdot v\ ds
+   -\int_{\Gamma_N} a \partial_n u \cdot v\ ds \\
+   + \int_{\Omega} c u \cdot v\ dx
+   = \int_{\Omega} f \cdot v\ dx \quad \forall v \in V
+
+Note that the integrals over the boundaries :math:`\Gamma_D` and :math:`\Gamma_N` vanish,
+since :math:`\partial_n u = 0` on :math:`\Gamma_N` and, due to :math:`v \in V`, :math:`u = 0` on :math:`\Gamma_D`.
+Thus we have derived the following integral problem of our problem,
+which is often referred to as the weak or variational form in the literature.
+
+.. admonition:: Weak form
+
+  Find :math:`u \in V` such that
+
+  .. math::
+
+    a(u,v) = l(v) \quad \forall v \in V
+
+  where :math:`a: V \times V \rightarrow \mathbb{R}` is the bilinear form defined as
+
+  .. math::
+
+    a(u,v) := \int_{\Omega} a \nabla u \cdot \nabla v\ dx + \int_{\Omega} c u \cdot v\ dx
+
+  and the right hand side :math:`l: V \rightarrow \mathbb{R}` is a linear form defined as
+
+  .. math::
+
+    l(v) := \int_{\Omega} f \cdot v\ dx
+
+
+Furthermore using the fundamental lemma of calculus of variations, it can be shown that the strong and the weak form
+are equivalent. Hence it suffices to solve the weak form of the problem.
+
+
+Finite Element Method
+^^^^^^^^^^^^^^^^^^^^^
+TODO !!!
+
+
+Iterative Methods
+^^^^^^^^^^^^^^^^^
+TODO !!!
+
+
+Grid Setup
+^^^^^^^^^^
+To transform the weak form of our problem into a linear equation system,
+we first need to discretize our domain. For that purpose, we create an initial triangulation of the domain,
+i.e. we divide :math:`\Omega` into a set of triangles. We call this triangulation the :blue:`coarse grid` and denote it as :math:`\mathbb{T}_0`.
+The grid consists of objects of type :code:`Node`, :code:`Edge` and :code:`Triangle`.
+
+.. figure:: img/CoarseGrid.svg
+    :alt: coarse_grid
+    :align: center
+
+.. centered:: Figure 2: Coarse grid (:math:`\mathbb{T}_0`)
+
+For the multigrid method, we need a sequence of such grids.
+In this work, we restrict our analysis to uniformly refined meshes.
+How can we create these refined meshes? We have to loop over all triangles of the grid
+and then refine them.
+
+.. figure:: img/triangle_refinement.svg
+    :alt: triangle_refinement
+    :align: center
+
+.. centered:: Figure 3: Refining a triangle
+
+To refine a triangle one simply needs to bisect all of its edges and draw a new triangle out of these three new nodes.
+As shown in figure 3, through the refinement process a triangle is being divided
+into four smaller triangles. Each :code:`Node` object needs to know its parent nodes.
+The parents are two end nodes of the edge that has been bisected, e.g. node 1 and node 2 are the parents of node 4.
+In the literature [1] these relationships are being stored in a father-son list.
+This is not needed in our case, due to Object Oriented Programming (OOP).
+
+Having refined all triangles of the coarse grid, we get a new triangulation :math:`\mathbb{T}_1`,
+which is called the grid on level 1. The :blue:`level` of a grid indicates how often we need to (globally)
+refine the coarse grid to construct that grid.
+
+.. figure:: img/GridLevel1.svg
+    :alt: grid_level_1
+    :align: center
+
+.. centered:: Figure 4: Grid on level 1 (:math:`\mathbb{T}_1`)
+
+We continue the process of refining the grid, until we end up with a grid, which has enough nodes
+to ensure that a sufficiently good approximation to the exact solution can be computed.
+
+.. figure:: img/GridLevel2.svg
+    :alt: grid_level_2
+    :align: center
+
+.. centered:: Figure 5: Grid on level 2 (:math:`\mathbb{T}_2`)
+
+The grid on the highest level, in this case :math:`\mathbb{T}_2` or more generally :math:`\mathbb{T}_L`, is called the finest grid
+and will be used to assemble the system matrix.
+
+Using the Finite Element Method, we can discretize the weak form of our PDE on each level grid
+with linear finite elements. For each level :math:`0 \leq l \leq L`, we get a linear equation system
+
+.. math::
+
+   A_l x_l = b_l \text{  with  } A_l \in \mathbb{R}^{n_l \times n_l}, x_l, b_l \in \mathbb{R}^{n_l},
+
+where :math:`n_l` is the number of degrees of freedom (DoFs), which in our case corresponds to the number of nodes in the grid.
+Note that the discrete function spaces :math:`\left( V_l \right)_{l=0}^L` from the FEM are conforming finite element spaces,
+i.e. :math:`V_0 \subset V_1 \subset \cdots \subset V_L`. If this wasn't the case, the grid transfer operations, which will be introduced shortly, would need to be modified.
+
+Two-grid algorithm
+^^^^^^^^^^^^^^^^^^
+To understand the multigrid algorithm we start by looking at the case where we only have two grids :math:`\mathbb{T}_{l}` and :math:`\mathbb{T}_{l+1}`.
+The mulitgrid algorithm is then only a recursive application of the two grid version.
+
+.. admonition:: Two-grid algorithm
+
+  Let :math:`A_h x_h = b_h` and :math:`A_{2h} x_{2h} = b_{2h}` with :math:`A_h \in \mathbb{R}^{n \times n}`,
+  :math:`A_{2h} \in \mathbb{R}^{m \times m}` and :math:`m < n`
+  denote the linear equation systems from the grids :math:`\mathbb{T}_{l+1}` and :math:`\mathbb{T}_{l}`.
+  Let the k-th iterate :math:`x_h^k` on the finer grid be given.
+
+  .. math::
+
+    &\text{def TGM(}x_h^k\text{):} \\
+    &\qquad\text{# 1. Apply } \nu_1 \text{ smoothing steps of an iterative method }S_1. \\
+    &\qquad x_h^{k,1} = S_1^{\nu_1}x_h^{k} \qquad{\scriptsize\textit{# PRE - SMOOTHING}} \\
+    \\
+    &\qquad\text{# 2. Restrict defect to coarse grid.}\\
+    &\qquad d_{2h} = I_h^{2h}(b_{h} - A_h x_{h}^{k,1}) \qquad{\scriptsize\textit{# }I_h^{2h}\textit{ := restriction operator}} \\
+    \\
+    &\qquad\text{# 3. Coarse grid correction.}\\
+    &\qquad x_{h}^{k,2} = x_{h}^{k,1} + I_{2h}^{h}(A_{2h}^{-1}d_{2h}) \qquad{\scriptsize\textit{# }I_{2h}^h\textit{ := prolongation operator}} \\
+    \\
+    &\qquad\text{# 4. Apply } \nu_2 \text{ smoothing steps of an iterative method }S_2. \\
+    &\qquad x_{h}^{k,3} = S_2^{\nu_2}x_h^{k,2} \qquad{\scriptsize\textit{# POST - SMOOTHING}} \\
+    \\
+    &\qquad\text{return }x_h^{k+1} := x_h^{k,3}
+
+.. hint::
+
+  In most cases we want the two-grid method to be a symmetric iteration.
+  Therefore we need :math:`\nu := \nu_1 = \nu_2` and :math:`S := S_1 = S_2^\ast` [4],
+  e.g. choose :math:`S_1` as forward Gauss-Seidel and :math:`S_2` as backward Gauss-Seidel.
+  Alternatively we have also implemented the :math:`\omega`-Jacobi method which can be used for pre- and post-smoothing.
+  Furthermore :math:`A_{2h}^{-1}d_{2h}` is not feasible to compute with a direct solver
+  if :math:`A_{2h}` is too large, which is often the case.
+  Thus :math:`A_{2h}^{-1}d_{2h}` can be understood as solving the linear equation system and can be done for example by another two-grid method. This recursion then produces the multigrid algorithm.
+
+Multigrid algorithm
+^^^^^^^^^^^^^^^^^^^
+.. admonition:: Multigrid algorithm
+
+  Let :math:`A_L x_L = b_L` denote the problem on the finest grid and :math:`A_l x_l = b_l`
+  the problems on the coarser grids for :math:`0 \leq l \leq L-1`.
+  Let :math:`\nu` denote the number of pre- and post-smoothing steps.
+  Let the k-th iterate :math:`x_l^k` on the l-th level be given.
+
+  .. math::
+
+    &\text{def MGM(}l,x_l^k,b_l\text{):} \\
+    &\qquad\text{# 1. Apply } \nu \text{ smoothing steps of an iterative method }S. \\
+    &\qquad x_l^{k,1} = S^{\nu}x_l^{k} \qquad{\scriptsize\textit{# PRE - SMOOTHING}} \\
+    \\
+    &\qquad\text{# 2. Restrict defect to coarse grid.}\\
+    &\qquad d_{l-1} = I_l^{l-1}(b_{l} - A_l x_{l}^{k,1}) \qquad{\scriptsize\textit{# }I_l^{l-1}\textit{ := restriction operator}} \\
+    \\
+    &\qquad\text{# 3. Coarse grid solution.}\\
+    &\qquad \text{if l == 1:} \\
+    &\qquad\qquad y_0 = A_0^{-1}d_0 \qquad{\scriptsize\textit{# direct solver on coarsest grid}} \\
+    &\qquad \text{else:}\\
+    &\qquad\qquad \text{for i in range(}\mu\text{)} \\
+    &\qquad\qquad\qquad y_{l-1} = \text{ MGM(}l-1,y_{l-1},d_{l-1}\text{)} \\
+    \\
+    &\qquad\text{# 4. Coarse grid correction.}\\
+    &\qquad x_{l}^{k,2} = x_{l}^{k,1} + I_{l-1}^{l}y_{l-1} \qquad{\scriptsize\textit{# }I_{l-1}^l\textit{ := prolongation operator}} \\
+    \\
+    &\qquad\text{# 5. Apply } \nu \text{ smoothing steps of an iterative method }S. \\
+    &\qquad x_{l}^{k,3} = S^{\nu}x_l^{k,2} \qquad{\scriptsize\textit{# POST - SMOOTHING}} \\
+    \\
+    &\qquad\text{return }x_l^{k+1} := x_l^{k,3}
+
+The parameter :math:`\mu \in \mathbb{N}^+` determines the :blue:`cycle` of the multigrid iteration.
+For :math:`\mu = 1` we get the V-cycle
+
+.. tikz::
+
+   \node (A) at (0,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (B) at (1,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (C) at (2,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (D) at (3,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+   \node (E) at (4,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (F) at (5,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (G) at (6,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+
+   \node [color=black] at (-1,3) {\tiny $l = 3$};
+   \node [color=black] at (-1,2) {\tiny $l = 2$};
+   \node [color=black] at (-1,1) {\tiny $l = 1$};
+   \node [color=black] at (-1,0) {\tiny $l = 0$};
+
+   {\color{blue}
+   \draw[->] (A) to (B);
+   \draw[->] (B) to (C);
+   \draw[->] (C) to (D);
+   }
+
+   {\color{black!40!green}
+   \draw[->] (D) to (E);
+   \draw[->] (E) to (F);
+   \draw[->] (F) to (G);
+   }
+
+
+.. centered:: Figure 6: V-cycle
+
+and for :math:`\mu = 2` we get the W-cycle.
+
+.. tikz::
+
+   \node (A) at (0,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (B) at (1,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (C) at (2,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (D) at (3,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+   \node (E) at (4,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (F) at (5,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+   \node (G) at (6,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (H) at (7,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (I) at (8,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (J) at (9,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+   \node (K) at (10,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (L) at (11,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+   \node (M) at (12,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (N) at (13,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+   \node (O) at (14,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+
+   \node [color=black] at (-1,3) {\scriptsize $l = 3$};
+   \node [color=black] at (-1,2) {\scriptsize $l = 2$};
+   \node [color=black] at (-1,1) {\scriptsize $l = 1$};
+   \node [color=black] at (-1,0) {\scriptsize $l = 0$};
+
+   {\color{blue}
+   \draw[->] (A) to (B);
+   \draw[->] (B) to (C);
+   \draw[->] (C) to (D);
+   }
+
+   {\color{black!40!green}
+   \draw[->] (D) to (E);
+   }
+   {\color{blue}
+   \draw[->] (E) to (F);
+   }
+   {\color{black!40!green}
+   \draw[->] (F) to (G);
+   \draw[->] (G) to (H);
+   }
+   {\color{blue}
+   \draw[->] (H) to (I);
+   \draw[->] (I) to (J);
+   }
+   {\color{black!40!green}
+   \draw[->] (J) to (K);
+   }
+   {\color{blue}
+   \draw[->] (K) to (L);
+   }
+   {\color{black!40!green}
+   \draw[->] (L) to (M);
+   \draw[->] (M) to (N);
+   \draw[->] (N) to (O);
+   }
+
+.. centered:: Figure 7: W-cycle
+
+In the figures of these schemes, white circles stand for :math:`\nu` steps of an iterative solver,
+black circles represent a direct solver, blue arrows illustrate a restriction and green arrows illustrate a prolongation.
+
+Grid transfer
+^^^^^^^^^^^^^
+As we have seen in the previous sections, the multigrid algorithm requires the ability to
+prolongate vectors from :math:`\mathbb{R}^{n_{l}}` to :math:`\mathbb{R}^{n_{l-1}}`.
+We will only show how the grid transfer operations work for conforming finite elements.
+For information on how to deal with non-conforming finite element spaces, please refer to [3].
+Let :math:`\left\{\varphi_1^l, \dots, \varphi_{n_{l}}^l\right\}` and
+:math:`\left\{\varphi_1^{l-1}, \dots, \varphi_{n_{l-1}}^{l-1}\right\}` be some given bases of
+:math:`V^l` and :math:`V^{l-1}`.
+Due to the conformity of the finite element spaces,
+:math:`V^{l-1} \subset V^l` holds and there exists a matrix :math:`I^{l-1}_l \in \mathbb{R}^{n_{-1} \times n_l}`
+such that
+
+.. math::
+
+  \begin{pmatrix}
+  \varphi_1^{l-1} \\
+  \vdots \\
+  \varphi_{n_{l-1}}^{l-1}
+  \end{pmatrix} = I^{l-1}_l
+  \begin{pmatrix}
+  \varphi_1^{l} \\
+  \vdots \\
+  \varphi_{n_{l}}^{l}
+  \end{pmatrix}.
+
+The matrix :math:`I^{l-1}_l` is called the :blue:`restriction matrix` and its transpose :math:`I^{l}_{l-1} = \left(I^{l-1}_l\right)^T` is called the :blue:`prolongation matrix.`
+These matrices are dependent on the finite elements that are being used and on the way that the grids have been refined.
+They have only very few non-zero entries and thus are stored as sparse matrices.
+Furthermore, they also have a significant impact on the rate of convergence of the multigrid algorithm [3]].
+Additionally, for linear partial differential equations the identity
+
+.. math::
+
+  A_{l-1} = I^{l}_{l-1} A_l I^{l-1}_l
+
+is fulfilled. Before taking a look at the actual implementation in our code,
+it is helpful to a see how the the grid transfer works for one dimensional linear finite elements.
+
+.. admonition:: Grid transfer in 1D
+
+  .. figure:: img/grid_transfer.png
+      :alt: grid_transfer
+      :align: center
+
+  .. centered:: Figure 8: Basis functions on the first two levels
+
+  It holds
+
+  .. math::
+
+    \varphi_1^0 &= \varphi_1^1 + \frac{1}{2}\varphi_3^1, \\
+    \varphi_2^0 &= \varphi_2^1 + \frac{1}{2}\varphi_3^1.
+
+  Consequently the restriction matrix reads
+
+  .. math::
+
+    I_1^0 =
+    \begin{bmatrix}
+    1 & & \frac{1}{2} \\
+    & 1 & \frac{1}{2}
+    \end{bmatrix}.
+
+We decided to follow these rules to create the interpolation matrix :math:`I_{l-1}^l`:
+
+* if the i.th node already exists on level :math:`{l-1}`, then :math:`\left(I_{l-1}^l\right)_{i,i} = 1`
+* else get the indices of the parents of the i.th node, then :math:`\left(I_{l-1}^l\right)_{i,\text{parent}_1} = \frac{1}{2}` and :math:`\left(I_{l-1}^l\right)_{i,\text{parent}_2} = \frac{1}{2}`
+
+The rest of this matrix is filled with zeros. Doing this for :math:`{l=1}` yields the prolongation matrix
+
+.. math::
+
+  I_0^1 =
+  \begin{bmatrix}
+  1 & & & & & & &  \\
+  & 1 & & & & & &  \\
+  & & 1 & & & & &  \\
+  & & & 1 & & & &  \\
+  & & & & 1 & & &  \\
+  & & & & & 1 & &  \\
+  & & & & & & 1 &  \\
+  & & & & & & & 1  \\
+  \frac{1}{2}&\frac{1}{2} & & & & & &  \\
+  & \frac{1}{2}&\frac{1}{2} & & & & &  \\
+  \frac{1}{2}& & &\frac{1}{2} & & & & \\
+  & \frac{1}{2}& & & \frac{1}{2}& & & \\
+  & & &\frac{1}{2} &\frac{1}{2} & & & \\
+  & &\frac{1}{2} & & &\frac{1}{2} & & \\
+  & & & &\frac{1}{2} &\frac{1}{2} & & \\
+  & & & \frac{1}{2}& & & \frac{1}{2}&  \\
+  & & & & \frac{1}{2}& & & \frac{1}{2}\\
+  & & & & & & \frac{1}{2}& \frac{1}{2}\\
+  \frac{1}{2}& & & &\frac{1}{2} & & & \\
+  & & &\frac{1}{2} & & & & \frac{1}{2} \\
+  &\frac{1}{2} & & & & \frac{1}{2}& &  \\
+  \end{bmatrix}.
+
+For our kind of prolongation matrix, the restriction matrix is given by
+
+.. math::
+
+  I_l^{l-1} = \frac{1}{4}\left( I_{l-1}^l \right)^T.
+
+At this point, we should also mention how the boundary conditions can be applied
+in the multigrid algorithm. The start vector of this method should be the zero vector on which the Dirichlet boundary conditions should be applied.
+Note that Dirichlet boundary conditions need to be applied to the output vectors of the prolongation and restriction,
+but here :red:`all Dirichlet boundary conditions are set to be homogeneous`.
+
+References
+^^^^^^^^^^
+#. Sven Beuchler. *Lecture notes in 'Multigrid and domain decomposition.'* April 2020.
+#. Thomas Wick. *Numerical Methods for Partial Differential Equations.* 2020. URL: `https://doi.org/10.15488/9248 <https://doi.org/10.15488/9248>`__.
+#. Dietrich Braess. *Finite Elemente.* Springer Berlin Heidelberg, 2013. DOI: 10.1007/978-3-642-34797-9. URL: `https://doi.org/10.1007%2F978-3-642-34797-9 <https://doi.org/10.1007%2F978-3-642-34797-9>`__.
+#. Chao Chen. "Geometric multigrid for eddy current problems". PhD thesis. 2012.
+#. Julian Roth. "Geometric Multigrid Methods for Maxwell's Equations". Bachelor thesis. 2020.
