@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Basics of Geometric Multigrid &mdash; Multigrid 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+        <script src="static/jquery.js"></script>
+        <script src="static/underscore.js"></script>
+        <script src="static/doctools.js"></script>
+        <script src="static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Results of Multigrid for Convection Diffusion" href="Multigrid.html" />
+    <link rel="prev" title="Welcome to Multigrid’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Multigrid
+          
+
+          
+            
+            <img src="static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Basics of Geometric Multigrid</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem-setup">Problem setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#finite-element-method">Finite Element Method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#iterative-methods">Iterative Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#grid-setup">Grid Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#two-grid-algorithm">Two-grid algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multigrid-algorithm">Multigrid algorithm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#grid-transfer">Grid transfer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Multigrid.html">Results of Multigrid for Convection Diffusion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Multigrid</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Basics of Geometric Multigrid</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="sources/basics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="basics-of-geometric-multigrid">
+<h1>Basics of Geometric Multigrid<a class="headerlink" href="#basics-of-geometric-multigrid" title="Permalink to this headline">¶</a></h1>
+<style> .blue {color:#3636eb;} </style><style> .red {color:#cc0000;} </style><div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>In the following, we are describing the <span class="blue">geometric multigrid method</span>,
+which for certain problems yields an iterative solver
+with optimal time complexity, i.e. the solver returns a solution to a PDE in
+<span class="math notranslate nohighlight">\(O(n_{\text{DoFs}})\)</span> arithmetic operations. We will show that this can also
+be achieved for some convection-diffusion equations on uniformly refined triangular
+meshes, when discretizing with linear finite elements.</p>
+</div>
+<div class="section" id="problem-setup">
+<h2>Problem setup<a class="headerlink" href="#problem-setup" title="Permalink to this headline">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(\Omega := (-1,1)^2 \setminus (0,1)^2\)</span> be an L-shaped <span class="blue">domain</span>. We decompose the boundary of this domain <span class="math notranslate nohighlight">\(\partial\Omega\)</span> into the Neumann boundary <span class="math notranslate nohighlight">\(\Gamma_D := (0,1) \times \{0\} \cup \{0\} \times (0,1)\)</span>
+and the Dirichlet boundary <span class="math notranslate nohighlight">\(\Gamma_N := \partial\Omega \setminus \Gamma_D\)</span>.</p>
+<p>Next, we define the <span class="blue">ansatz</span> and <span class="blue">test function space</span> <span class="math notranslate nohighlight">\(V := \left\{ u \in H^1(\Omega)\mid u = 0 \text{ on } \Gamma_D \right\}\)</span>,
+where</p>
+<div class="math notranslate nohighlight">
+\[H^1(\Omega) := W^{1,2}(\Omega) := \left\{ u \in L^2(\Omega) \mid \nabla u \in L^2( \Omega ) \right\}\]</div>
+<p>is the Sobolev space containing the weakly differentiable functions
+in <span class="math notranslate nohighlight">\(\Omega\)</span>. Note that we haven’t explicitly prescribed any boundary conditions on <span class="math notranslate nohighlight">\(\Gamma_N\)</span> in the function space,
+since the homogeneous Neumann boundary conditions come up naturally when deriving the variational form of the problem.
+Further, we need a right hand side function</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f(x) :=
+\begin{cases}
+   -1 &amp; \text{for } x \in (-1,0) \times (0,1) \\
+   0 &amp; \text{for } x \in (-1,0) \times (-1,0) \\
+   1 &amp; \text{for } x \in (0,1) \times (-1,0) \\
+\end{cases}.\end{split}\]</div>
+<div class="figure align-center">
+<img alt="domain" src="images/domain.svg" /></div>
+<p class="centered">
+<strong>Figure 1: Domain <span class="math notranslate nohighlight">\(\Omega\)</span></strong></p><p>Using the parameters <span class="math notranslate nohighlight">\(a = 1\)</span> and <span class="math notranslate nohighlight">\(c = 0\)</span> in <span class="math notranslate nohighlight">\(\Omega\)</span>, we can now
+formulate the strong form of our convection diffusion equation:</p>
+<div class="admonition-strong-form admonition">
+<p class="admonition-title">Strong form</p>
+<p>Find <span class="math notranslate nohighlight">\(u: \Omega \rightarrow \mathbb{R}\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}-\nabla \cdot \left( a \nabla u\right) + c u &amp;= f \quad \text{in } \Omega \qquad (1)\\
+u &amp;= 0 \quad \text{on } \Gamma_D \\
+\partial_n u &amp;= 0 \quad \text{on } \Gamma_N\end{split}\]</div>
+</div>
+<p>In the above formulation, we used the notation <span class="math notranslate nohighlight">\(\partial n := \nabla \cdot n\)</span>.
+To be able to solve this problem, we need to convert it into its integral form.
+Therefore we multiply (1) from the right with a test function <span class="math notranslate nohighlight">\(v \in V\)</span> and integrate over <span class="math notranslate nohighlight">\(\Omega\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[-\int_{\Omega} \left(\nabla \cdot \left( a \nabla u\right)\right) \cdot v\ dx
++ \int_{\Omega} c u \cdot v\ dx
+= \int_{\Omega} f \cdot v\ dx \quad \forall v \in V\]</div>
+<p>Now integration of parts can be applied to the first integral and we use the fact that <span class="math notranslate nohighlight">\(\partial \Omega = \Gamma_D\ \dot\cup\ \Gamma_N\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\int_{\Omega} a \nabla u \cdot \nabla v\ dx
+-\int_{\Gamma_D} a \partial_n u \cdot v\ ds
+-\int_{\Gamma_N} a \partial_n u \cdot v\ ds \\
++ \int_{\Omega} c u \cdot v\ dx
+= \int_{\Omega} f \cdot v\ dx \quad \forall v \in V\end{split}\]</div>
+<p>Note that the integrals over the boundaries <span class="math notranslate nohighlight">\(\Gamma_D\)</span> and <span class="math notranslate nohighlight">\(\Gamma_N\)</span> vanish,
+since <span class="math notranslate nohighlight">\(\partial_n u = 0\)</span> on <span class="math notranslate nohighlight">\(\Gamma_N\)</span> and, due to <span class="math notranslate nohighlight">\(v \in V\)</span>, <span class="math notranslate nohighlight">\(u = 0\)</span> on <span class="math notranslate nohighlight">\(\Gamma_D\)</span>.
+Thus we have derived the following integral problem of our problem,
+which is often referred to as the weak or variational form in the literature.</p>
+<div class="admonition-weak-form admonition">
+<p class="admonition-title">Weak form</p>
+<p>Find <span class="math notranslate nohighlight">\(u \in V\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[a(u,v) = l(v) \quad \forall v \in V\]</div>
+<p>where <span class="math notranslate nohighlight">\(a: V \times V \rightarrow \mathbb{R}\)</span> is the bilinear form defined as</p>
+<div class="math notranslate nohighlight">
+\[a(u,v) := \int_{\Omega} a \nabla u \cdot \nabla v\ dx + \int_{\Omega} c u \cdot v\ dx\]</div>
+<p>and the right hand side <span class="math notranslate nohighlight">\(l: V \rightarrow \mathbb{R}\)</span> is a linear form defined as</p>
+<div class="math notranslate nohighlight">
+\[l(v) := \int_{\Omega} f \cdot v\ dx\]</div>
+</div>
+<p>Furthermore using the fundamental lemma of calculus of variations, it can be shown that the strong and the weak form
+are equivalent. Hence it suffices to solve the weak form of the problem.</p>
+</div>
+<div class="section" id="finite-element-method">
+<h2>Finite Element Method<a class="headerlink" href="#finite-element-method" title="Permalink to this headline">¶</a></h2>
+<p>TODO !!!</p>
+</div>
+<div class="section" id="iterative-methods">
+<h2>Iterative Methods<a class="headerlink" href="#iterative-methods" title="Permalink to this headline">¶</a></h2>
+<p>TODO !!!</p>
+</div>
+<div class="section" id="grid-setup">
+<h2>Grid Setup<a class="headerlink" href="#grid-setup" title="Permalink to this headline">¶</a></h2>
+<p>To transform the weak form of our problem into a linear equation system,
+we first need to discretize our domain. For that purpose, we create an initial triangulation of the domain,
+i.e. we divide <span class="math notranslate nohighlight">\(\Omega\)</span> into a set of triangles. We call this triangulation the <span class="blue">coarse grid</span> and denote it as <span class="math notranslate nohighlight">\(\mathbb{T}_0\)</span>.
+The grid consists of objects of type <code class="code docutils literal notranslate"><span class="pre">Node</span></code>, <code class="code docutils literal notranslate"><span class="pre">Edge</span></code> and <code class="code docutils literal notranslate"><span class="pre">Triangle</span></code>.</p>
+<div class="figure align-center">
+<img alt="coarse_grid" src="images/CoarseGrid.svg" /></div>
+<p class="centered">
+<strong>Figure 2: Coarse grid (<span class="math notranslate nohighlight">\(\mathbb{T}_0\)</span>)</strong></p><p>For the multigrid method, we need a sequence of such grids.
+In this work, we restrict our analysis to uniformly refined meshes.
+How can we create these refined meshes? We have to loop over all triangles of the grid
+and then refine them.</p>
+<div class="figure align-center">
+<img alt="triangle_refinement" src="images/triangle_refinement.svg" /></div>
+<p class="centered">
+<strong>Figure 3: Refining a triangle</strong></p><p>To refine a triangle one simply needs to bisect all of its edges and draw a new triangle out of these three new nodes.
+As shown in figure 3, through the refinement process a triangle is being divided
+into four smaller triangles. Each <code class="code docutils literal notranslate"><span class="pre">Node</span></code> object needs to know its parent nodes.
+The parents are two end nodes of the edge that has been bisected, e.g. node 1 and node 2 are the parents of node 4.
+In the literature [1] these relationships are being stored in a father-son list.
+This is not needed in our case, due to Object Oriented Programming (OOP).</p>
+<p>Having refined all triangles of the coarse grid, we get a new triangulation <span class="math notranslate nohighlight">\(\mathbb{T}_1\)</span>,
+which is called the grid on level 1. The <span class="blue">level</span> of a grid indicates how often we need to (globally)
+refine the coarse grid to construct that grid.</p>
+<div class="figure align-center">
+<img alt="grid_level_1" src="images/GridLevel1.svg" /></div>
+<p class="centered">
+<strong>Figure 4: Grid on level 1 (<span class="math notranslate nohighlight">\(\mathbb{T}_1\)</span>)</strong></p><p>We continue the process of refining the grid, until we end up with a grid, which has enough nodes
+to ensure that a sufficiently good approximation to the exact solution can be computed.</p>
+<div class="figure align-center">
+<img alt="grid_level_2" src="images/GridLevel2.svg" /></div>
+<p class="centered">
+<strong>Figure 5: Grid on level 2 (<span class="math notranslate nohighlight">\(\mathbb{T}_2\)</span>)</strong></p><p>The grid on the highest level, in this case <span class="math notranslate nohighlight">\(\mathbb{T}_2\)</span> or more generally <span class="math notranslate nohighlight">\(\mathbb{T}_L\)</span>, is called the finest grid
+and will be used to assemble the system matrix.</p>
+<p>Using the Finite Element Method, we can discretize the weak form of our PDE on each level grid
+with linear finite elements. For each level <span class="math notranslate nohighlight">\(0 \leq l \leq L\)</span>, we get a linear equation system</p>
+<div class="math notranslate nohighlight">
+\[A_l x_l = b_l \text{  with  } A_l \in \mathbb{R}^{n_l \times n_l}, x_l, b_l \in \mathbb{R}^{n_l},\]</div>
+<p>where <span class="math notranslate nohighlight">\(n_l\)</span> is the number of degrees of freedom (DoFs), which in our case corresponds to the number of nodes in the grid.
+Note that the discrete function spaces <span class="math notranslate nohighlight">\(\left( V_l \right)_{l=0}^L\)</span> from the FEM are conforming finite element spaces,
+i.e. <span class="math notranslate nohighlight">\(V_0 \subset V_1 \subset \cdots \subset V_L\)</span>. If this wasn’t the case, the grid transfer operations, which will be introduced shortly, would need to be modified.</p>
+</div>
+<div class="section" id="two-grid-algorithm">
+<h2>Two-grid algorithm<a class="headerlink" href="#two-grid-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>To understand the multigrid algorithm we start by looking at the case where we only have two grids <span class="math notranslate nohighlight">\(\mathbb{T}_{l}\)</span> and <span class="math notranslate nohighlight">\(\mathbb{T}_{l+1}\)</span>.
+The mulitgrid algorithm is then only a recursive application of the two grid version.</p>
+<div class="admonition-two-grid-algorithm admonition">
+<p class="admonition-title">Two-grid algorithm</p>
+<p>Let <span class="math notranslate nohighlight">\(A_h x_h = b_h\)</span> and <span class="math notranslate nohighlight">\(A_{2h} x_{2h} = b_{2h}\)</span> with <span class="math notranslate nohighlight">\(A_h \in \mathbb{R}^{n \times n}\)</span>,
+<span class="math notranslate nohighlight">\(A_{2h} \in \mathbb{R}^{m \times m}\)</span> and <span class="math notranslate nohighlight">\(m &lt; n\)</span>
+denote the linear equation systems from the grids <span class="math notranslate nohighlight">\(\mathbb{T}_{l+1}\)</span> and <span class="math notranslate nohighlight">\(\mathbb{T}_{l}\)</span>.
+Let the k-th iterate <span class="math notranslate nohighlight">\(x_h^k\)</span> on the finer grid be given.</p>
+<div class="figure align-center">
+<img alt="tgm" src="images/tgm_trans.png" />
+</div>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>In most cases we want the two-grid method to be a symmetric iteration.
+Therefore we need <span class="math notranslate nohighlight">\(\nu := \nu_1 = \nu_2\)</span> and <span class="math notranslate nohighlight">\(S := S_1 = S_2^\ast\)</span> [4],
+e.g. choose <span class="math notranslate nohighlight">\(S_1\)</span> as forward Gauss-Seidel and <span class="math notranslate nohighlight">\(S_2\)</span> as backward Gauss-Seidel.
+Alternatively we have also implemented the <span class="math notranslate nohighlight">\(\omega\)</span>-Jacobi method which can be used for pre- and post-smoothing.
+Furthermore <span class="math notranslate nohighlight">\(A_{2h}^{-1}d_{2h}\)</span> is not feasible to compute with a direct solver
+if <span class="math notranslate nohighlight">\(A_{2h}\)</span> is too large, which is often the case.
+Thus <span class="math notranslate nohighlight">\(A_{2h}^{-1}d_{2h}\)</span> can be understood as solving the linear equation system and can be done for example by another two-grid method. This recursion then produces the multigrid algorithm.</p>
+</div>
+</div>
+<div class="section" id="multigrid-algorithm">
+<h2>Multigrid algorithm<a class="headerlink" href="#multigrid-algorithm" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-multigrid-algorithm admonition">
+<p class="admonition-title">Multigrid algorithm</p>
+<p>Let <span class="math notranslate nohighlight">\(A_L x_L = b_L\)</span> denote the problem on the finest grid and <span class="math notranslate nohighlight">\(A_l x_l = b_l\)</span>
+the problems on the coarser grids for <span class="math notranslate nohighlight">\(0 \leq l \leq L-1\)</span>.
+Let <span class="math notranslate nohighlight">\(\nu\)</span> denote the number of pre- and post-smoothing steps.
+Let the k-th iterate <span class="math notranslate nohighlight">\(x_l^k\)</span> on the l-th level be given.</p>
+<div class="figure align-center">
+<img alt="mgm" src="images/mgm_trans.png" />
+</div>
+</div>
+<p>The parameter <span class="math notranslate nohighlight">\(\mu \in \mathbb{N}^+\)</span> determines the <span class="blue">cycle</span> of the multigrid iteration.
+For <span class="math notranslate nohighlight">\(\mu = 1\)</span> we get the V-cycle</p>
+<div class="figure">
+<p><img src="images/tikz-bf0cb5d157710f5536fe0d52b59615e9e5f4431c.png" alt="\node (A) at (0,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (B) at (1,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (C) at (2,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (D) at (3,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+\node (E) at (4,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (F) at (5,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (G) at (6,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+
+\node [color=black] at (-1,3) {\tiny $l = 3$};
+\node [color=black] at (-1,2) {\tiny $l = 2$};
+\node [color=black] at (-1,1) {\tiny $l = 1$};
+\node [color=black] at (-1,0) {\tiny $l = 0$};
+
+{\color{blue}
+\draw[-&gt;] (A) to (B);
+\draw[-&gt;] (B) to (C);
+\draw[-&gt;] (C) to (D);
+}
+
+{\color{black!40!green}
+\draw[-&gt;] (D) to (E);
+\draw[-&gt;] (E) to (F);
+\draw[-&gt;] (F) to (G);
+}" /></p>
+</div><p class="centered">
+<strong>Figure 6: V-cycle</strong></p><p>and for <span class="math notranslate nohighlight">\(\mu = 2\)</span> we get the W-cycle.</p>
+<div class="figure">
+<p><img src="images/tikz-362301dbc83d59069c61878e8ce3341f1b2ddb32.png" alt="\node (A) at (0,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (B) at (1,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (C) at (2,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (D) at (3,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+\node (E) at (4,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (F) at (5,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+\node (G) at (6,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (H) at (7,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (I) at (8,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (J) at (9,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+\node (K) at (10,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (L) at (11,0) [circle, minimum size=2mm, inner sep=0pt,fill = black, draw] {};
+\node (M) at (12,1) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (N) at (13,2) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+\node (O) at (14,3) [circle, minimum size=2mm, inner sep=0pt,draw] {};
+
+\node [color=black] at (-1,3) {\scriptsize $l = 3$};
+\node [color=black] at (-1,2) {\scriptsize $l = 2$};
+\node [color=black] at (-1,1) {\scriptsize $l = 1$};
+\node [color=black] at (-1,0) {\scriptsize $l = 0$};
+
+{\color{blue}
+\draw[-&gt;] (A) to (B);
+\draw[-&gt;] (B) to (C);
+\draw[-&gt;] (C) to (D);
+}
+
+{\color{black!40!green}
+\draw[-&gt;] (D) to (E);
+}
+{\color{blue}
+\draw[-&gt;] (E) to (F);
+}
+{\color{black!40!green}
+\draw[-&gt;] (F) to (G);
+\draw[-&gt;] (G) to (H);
+}
+{\color{blue}
+\draw[-&gt;] (H) to (I);
+\draw[-&gt;] (I) to (J);
+}
+{\color{black!40!green}
+\draw[-&gt;] (J) to (K);
+}
+{\color{blue}
+\draw[-&gt;] (K) to (L);
+}
+{\color{black!40!green}
+\draw[-&gt;] (L) to (M);
+\draw[-&gt;] (M) to (N);
+\draw[-&gt;] (N) to (O);
+}" /></p>
+</div><p class="centered">
+<strong>Figure 7: W-cycle</strong></p><p>In the figures of these schemes, white circles stand for <span class="math notranslate nohighlight">\(\nu\)</span> steps of an iterative solver,
+black circles represent a direct solver, blue arrows illustrate a restriction and green arrows illustrate a prolongation.</p>
+</div>
+<div class="section" id="grid-transfer">
+<h2>Grid transfer<a class="headerlink" href="#grid-transfer" title="Permalink to this headline">¶</a></h2>
+<p>As we have seen in the previous sections, the multigrid algorithm requires the ability to
+prolongate vectors from <span class="math notranslate nohighlight">\(\mathbb{R}^{n_{l}}\)</span> to <span class="math notranslate nohighlight">\(\mathbb{R}^{n_{l-1}}\)</span>.
+We will only show how the grid transfer operations work for conforming finite elements.
+For information on how to deal with non-conforming finite element spaces, please refer to [3].
+Let <span class="math notranslate nohighlight">\(\left\{\varphi_1^l, \dots, \varphi_{n_{l}}^l\right\}\)</span> and
+<span class="math notranslate nohighlight">\(\left\{\varphi_1^{l-1}, \dots, \varphi_{n_{l-1}}^{l-1}\right\}\)</span> be some given bases of
+<span class="math notranslate nohighlight">\(V^l\)</span> and <span class="math notranslate nohighlight">\(V^{l-1}\)</span>.
+Due to the conformity of the finite element spaces,
+<span class="math notranslate nohighlight">\(V^{l-1} \subset V^l\)</span> holds and there exists a matrix <span class="math notranslate nohighlight">\(I^{l-1}_l \in \mathbb{R}^{n_{-1} \times n_l}\)</span>
+such that</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{pmatrix}
+\varphi_1^{l-1} \\
+\vdots \\
+\varphi_{n_{l-1}}^{l-1}
+\end{pmatrix} = I^{l-1}_l
+\begin{pmatrix}
+\varphi_1^{l} \\
+\vdots \\
+\varphi_{n_{l}}^{l}
+\end{pmatrix}.\end{split}\]</div>
+<p>The matrix <span class="math notranslate nohighlight">\(I^{l-1}_l\)</span> is called the <span class="blue">restriction matrix</span> and its transpose <span class="math notranslate nohighlight">\(I^{l}_{l-1} = \left(I^{l-1}_l\right)^T\)</span> is called the <span class="blue">prolongation matrix.</span>
+These matrices are dependent on the finite elements that are being used and on the way that the grids have been refined.
+They have only very few non-zero entries and thus are stored as sparse matrices.
+Furthermore, they also have a significant impact on the rate of convergence of the multigrid algorithm [3]].
+Additionally, for linear partial differential equations the identity</p>
+<div class="math notranslate nohighlight">
+\[A_{l-1} = I^{l}_{l-1} A_l I^{l-1}_l\]</div>
+<p>is fulfilled. Before taking a look at the actual implementation in our code,
+it is helpful to a see how the the grid transfer works for one dimensional linear finite elements.</p>
+<div class="admonition-grid-transfer-in-1d admonition">
+<p class="admonition-title">Grid transfer in 1D</p>
+<div class="figure align-center">
+<img alt="grid_transfer" src="images/grid_transfer.png" />
+</div>
+<p class="centered">
+<strong>Figure 8: Basis functions on the first two levels</strong></p><p>It holds</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\varphi_1^0 &amp;= \varphi_1^1 + \frac{1}{2}\varphi_3^1, \\
+\varphi_2^0 &amp;= \varphi_2^1 + \frac{1}{2}\varphi_3^1.\end{split}\]</div>
+<p>Consequently the restriction matrix reads</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}I_1^0 =
+\begin{bmatrix}
+1 &amp; &amp; \frac{1}{2} \\
+&amp; 1 &amp; \frac{1}{2}
+\end{bmatrix}.\end{split}\]</div>
+</div>
+<p>We decided to follow these rules to create the interpolation matrix <span class="math notranslate nohighlight">\(I_{l-1}^l\)</span>:</p>
+<ul class="simple">
+<li><p>if the i.th node already exists on level <span class="math notranslate nohighlight">\({l-1}\)</span>, then <span class="math notranslate nohighlight">\(\left(I_{l-1}^l\right)_{i,i} = 1\)</span></p></li>
+<li><p>else get the indices of the parents of the i.th node, then <span class="math notranslate nohighlight">\(\left(I_{l-1}^l\right)_{i,\text{parent}_1} = \frac{1}{2}\)</span> and <span class="math notranslate nohighlight">\(\left(I_{l-1}^l\right)_{i,\text{parent}_2} = \frac{1}{2}\)</span></p></li>
+</ul>
+<p>The rest of this matrix is filled with zeros. Doing this for <span class="math notranslate nohighlight">\({l=1}\)</span> yields the prolongation matrix</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}I_0^1 =
+\begin{bmatrix}
+1 &amp; &amp; &amp; &amp; &amp; &amp; &amp;  \\
+&amp; 1 &amp; &amp; &amp; &amp; &amp; &amp;  \\
+&amp; &amp; 1 &amp; &amp; &amp; &amp; &amp;  \\
+&amp; &amp; &amp; 1 &amp; &amp; &amp; &amp;  \\
+&amp; &amp; &amp; &amp; 1 &amp; &amp; &amp;  \\
+&amp; &amp; &amp; &amp; &amp; 1 &amp; &amp;  \\
+&amp; &amp; &amp; &amp; &amp; &amp; 1 &amp;  \\
+&amp; &amp; &amp; &amp; &amp; &amp; &amp; 1  \\
+\frac{1}{2}&amp;\frac{1}{2} &amp; &amp; &amp; &amp; &amp; &amp;  \\
+&amp; \frac{1}{2}&amp;\frac{1}{2} &amp; &amp; &amp; &amp; &amp;  \\
+\frac{1}{2}&amp; &amp; &amp;\frac{1}{2} &amp; &amp; &amp; &amp; \\
+&amp; \frac{1}{2}&amp; &amp; &amp; \frac{1}{2}&amp; &amp; &amp; \\
+&amp; &amp; &amp;\frac{1}{2} &amp;\frac{1}{2} &amp; &amp; &amp; \\
+&amp; &amp;\frac{1}{2} &amp; &amp; &amp;\frac{1}{2} &amp; &amp; \\
+&amp; &amp; &amp; &amp;\frac{1}{2} &amp;\frac{1}{2} &amp; &amp; \\
+&amp; &amp; &amp; \frac{1}{2}&amp; &amp; &amp; \frac{1}{2}&amp;  \\
+&amp; &amp; &amp; &amp; \frac{1}{2}&amp; &amp; &amp; \frac{1}{2}\\
+&amp; &amp; &amp; &amp; &amp; &amp; \frac{1}{2}&amp; \frac{1}{2}\\
+\frac{1}{2}&amp; &amp; &amp; &amp;\frac{1}{2} &amp; &amp; &amp; \\
+&amp; &amp; &amp;\frac{1}{2} &amp; &amp; &amp; &amp; \frac{1}{2} \\
+&amp;\frac{1}{2} &amp; &amp; &amp; &amp; \frac{1}{2}&amp; &amp;  \\
+\end{bmatrix}.\end{split}\]</div>
+<p>For our kind of prolongation matrix, the restriction matrix is given by</p>
+<div class="math notranslate nohighlight">
+\[I_l^{l-1} = \frac{1}{4}\left( I_{l-1}^l \right)^T.\]</div>
+<p>At this point, we should also mention how the boundary conditions can be applied
+in the multigrid algorithm. The start vector of this method should be the zero vector on which the Dirichlet boundary conditions should be applied.
+Note that Dirichlet boundary conditions need to be applied to the output vectors of the prolongation and restriction,
+but here <span class="red">all Dirichlet boundary conditions are set to be homogeneous</span>.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Sven Beuchler. <em>Lecture notes in ‘Multigrid and domain decomposition.’</em> April 2020.</p></li>
+<li><p>Thomas Wick. <em>Numerical Methods for Partial Differential Equations.</em> 2020. URL: <a class="reference external" href="https://doi.org/10.15488/9248">https://doi.org/10.15488/9248</a>.</p></li>
+<li><p>Dietrich Braess. <em>Finite Elemente.</em> Springer Berlin Heidelberg, 2013. DOI: 10.1007/978-3-642-34797-9. URL: <a class="reference external" href="https://doi.org/10.1007%2F978-3-642-34797-9">https://doi.org/10.1007%2F978-3-642-34797-9</a>.</p></li>
+<li><p>Chao Chen. “Geometric multigrid for eddy current problems”. PhD thesis. 2012.</p></li>
+<li><p>Julian Roth. “Geometric Multigrid Methods for Maxwell’s Equations”. Bachelor thesis. 2020.</p></li>
+</ol>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Multigrid.html" class="btn btn-neutral float-right" title="Results of Multigrid for Convection Diffusion" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Multigrid’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Julian Roth, Max Schröder
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
