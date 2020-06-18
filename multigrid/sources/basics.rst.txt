@@ -18,7 +18,7 @@ Introduction
 ^^^^^^^^^^^^
 In the following, we are describing the :blue:`geometric multigrid method`,
 which for certain problems yields an iterative solver
-with optimal time complexity, i.e. the solver returns a solution to a PDE in
+with optimal cost complexity, i.e. the solver returns a solution to a PDE in
 :math:`O(n_{\text{DoFs}})` arithmetic operations. We will show that this can also
 be achieved for some convection-diffusion equations on uniformly refined triangular
 meshes, when discretizing with linear finite elements.
@@ -33,7 +33,7 @@ where
 
 .. math::
 
-  H^1(\Omega) := W^{1,2}(\Omega) := \left\{ u \in L^2(\Omega) \mid \nabla u \in L^2( \Omega ) \right\}
+  H^1(\Omega) := W^{1,2}(\Omega) := \left\{ u \in L^2(\Omega) \mid |\nabla u| \in L^2( \Omega ) \right\}
 
 is the Sobolev space containing the weakly differentiable functions
 in :math:`\Omega`. Note that we haven't explicitly prescribed any boundary conditions on :math:`\Gamma_N` in the function space,
@@ -121,13 +121,234 @@ are equivalent. Hence it suffices to solve the weak form of the problem.
 
 Finite Element Method
 ^^^^^^^^^^^^^^^^^^^^^
-TODO !!!
+The problem that we are facing is that :math:`V` is an infinite dimensional function space
+and we need the ability to solve the weak form with a classical computer.
+Hence instead we work with a finite dimensional subspace :math:`V_h \subset V`.
+This will enable us to rewrite the weak form as a linear equation system.
 
+Let a subdivision of :math:`\Omega` into :blue:`finite elements` :math:`(K,P_1,\Sigma)`
+be given, where
+
+* :math:`K` is a two dimensional right triangle,
+* :math:`P_1(K) := \operatorname{span}\{1-x_1-x_2, x_1, x_2 \}` is the space of linear functions defined on :math:`K`,
+* :math:`\Sigma := \{a_0, a_1, a_2 \}` is a set of :blue:`degrees of freedom` (DoF), which here are the values of the polynomial at the vertices of :math:`K`.
+
+Then a :math:`P_1(K)` function is defined by
+
+.. math::
+
+  u(x) = a_0 + a_1x_1 + a_2x_2 \quad \forall x = (x_1,x_2) \in K.
+
+To recapitulate: First, we have divided :math:`\Omega` into triangles :math:`K_1, ..., K_m`. Examples for this can be found in the section `"Grid Setup" <#grid-setup>`__.
+Secondly, we have seen that we have the parameters (DoFs) which can describe any linear function on such a triangle :math:`K_k`.
+Now simply define our function space :math:`V_h` as the space of functions which are continuous on the whole domain :math:`\Omega`, linear on each triangle :math:`K_k` and satisfy the Dirichlet boundary conditions, i.e.
+
+.. math::
+
+  V_h := \{ v_h \in C(\Omega) \mid v_h |_{K_k} \in P_1(K_k) \quad \forall 1 \leq k \leq m,\ v_h = 0 \text{ on } \Gamma_D \}.
+
+We use the index :math:`h` to show that we are not longer using the infinite dimensional function space :math:`V`,
+but a finite dimensional subspace which is defined on triangles :math:`K_k` where the short sides have length :math:`h`.
+By working with :math:`V_h`, we now try to find an element-wise linear approximation to the solution of the weak form.
+
+Thus we are now trying to solve the discrete weak form:
+
+.. admonition:: Discrete weak form
+
+  Find :math:`u_h \in V_h` such that
+
+  .. math::
+
+    a(u_h,v_h) = l(v_h) \quad \forall v_h \in V_h
+
+Furthermore, we know that :math:`V_h` is finite dimensional and we can write down its basis, since we know the bases of :math:`P_1(K_k)`.
+Hence
+
+.. math::
+
+  V_h = \operatorname{span}\{ \phi_1, \dots, \phi_{n_{DoFs}} \},
+
+where :math:`\phi_i` is the basis function corresponding to the i.th degree of freedom, i.e. the i.th grid point. It follows that
+
+.. math::
+
+  u_h = \sum_{i= 0}^{n_{DoFs}} u_i \phi_i \quad \text{and} \quad v_h = \sum_{i= 0}^{n_{DoFs}} v_i \phi_i
+
+for some :math:`\begin{pmatrix}u_1, \dots u_{n_{DoFs}}\end{pmatrix}^T, \begin{pmatrix}v_1, \dots v_{n_{DoFs}}\end{pmatrix}^T \in \mathbb{R}^{n_{DoFs}}`. Therefore the discrete weak form can be written as
+
+.. math::
+
+  a\left(\sum_{i= 0}^{n_{DoFs}} u_i \phi_i,\sum_{j= 0}^{n_{DoFs}} v_j \phi_j \right) = l\left(\sum_{j= 0}^{n_{DoFs}} v_j \phi_j \right).
+
+Since :math:`a` is linear in the second argument and :math:`l` is also linear, it is thus sufficient to solve
+
+.. math::
+
+  a\left(\sum_{i= 0}^{n_{DoFs}} u_i \phi_i,\phi_j \right) = l\left(\phi_j \right) \quad \forall 1 \leq j \leq n_{DoFs}.
+
+The convection-diffusion problem is linear itself, thus :math:`a` is also linear in the first argument and we get
+
+.. math::
+
+  \sum_{i= 0}^{n_{DoFs}} u_i\ a\left(\phi_i,\phi_j \right) = l\left(\phi_j \right) \quad \forall 1 \leq j \leq n_{DoFs}.
+
+This can also be written as a linear equation system
+
+.. math::
+
+  \begin{bmatrix}
+    a\left(\phi_1,\phi_1 \right) & \cdots & a\left(\phi_{n_{DoFs}},\phi_1 \right) \\
+    \vdots & \ddots & \vdots \\
+    a\left(\phi_1,\phi_{n_{DoFs}} \right) & \cdots & a\left(\phi_{n_{DoFs}},\phi_{n_{DoFs}} \right)
+  \end{bmatrix}
+  \begin{bmatrix}
+    u_1\\
+    \vdots\\
+    u_{n_{DoFs}}
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    l(u_1)\\
+    \vdots\\
+    l(u_{n_{DoFs}})
+  \end{bmatrix}.
+
+To remain consistent with future chapters, we follow the naming convention
+
+.. math::
+
+  A_h &:= \begin{bmatrix}
+    a\left(\phi_1,\phi_1 \right) & \cdots & a\left(\phi_{n_{DoFs}},\phi_1 \right) \\
+    \vdots & \ddots & \vdots \\
+    a\left(\phi_1,\phi_{n_{DoFs}} \right) & \cdots & a\left(\phi_{n_{DoFs}},\phi_{n_{DoFs}} \right)
+  \end{bmatrix}, \\
+  x_h &:= \begin{bmatrix}
+    u_1\\
+    \vdots\\
+    u_{n_{DoFs}}
+  \end{bmatrix}  \quad \text{ and } \\
+  b_h &:= \begin{bmatrix}
+    l(u_1)\\
+    \vdots\\
+    l(u_{n_{DoFs}})
+  \end{bmatrix}.
+
+To be able to solve :math:`A_h x_h = b_h`, we need an efficient way to compute :math:`a\left(\phi_i,\phi_j \right)` and :math:`l\left(\phi_j \right)`.
+For that we use that :math:`\Omega = \cup_{k = 1}^{n_{DoFs}}K_k` and we thus get
+
+.. math::
+
+  a(\phi_i,\phi_j) &= \int_{\Omega} a \nabla \phi_i \cdot \nabla \phi_j\ dx + \int_{\Omega} c \phi_i \cdot \phi_j\ dx \\
+                  &= \sum_{k = 1}^{n_{DoFs}} \left( \int_{K_k} a \nabla \phi_i \cdot \nabla \phi_j\ dx + \int_{K_k} c \phi_i \cdot \phi_j\ dx  \right),
+
+similarly we get for the right hand functional
+
+.. math::
+
+  l(\phi_j) &= \int_{\Omega} f \cdot \phi_j\ dx \\
+            &= \sum_{k = 1}^{n_{DoFs}} \left( \int_{K_k} f \cdot \phi_j\ dx \right).
+
+Note that many of these integrals are zero, since the basis functions :math:`\phi_i` only have support on the triangles that contain the vertex corresponding
+to the i.th degree of freedom. Furthermore, we use the isoparametric concept that allows us to assemble the :blue:`system matrix` :math:`A_h` and :blue:`right side` :math:`b_h`
+by once computing integrals on a reference element :math:`\hat{K}` and then transforming the results to the elements :math:`K_k`.
+
+.. figure:: img/trafo.png
+    :alt: trafo
+    :align: center
+
+.. centered:: Figure 2: Transformation from reference element to finite element
+
+We now apply the transformation theorem
+
+.. math::
+
+  \int_{\hat{K}} g\left(T_k\left(\hat{x}\right)\right)\left|\det\left(\nabla T_k\left(\hat{x}\right)\right)\right|\ d\hat{x} = \int_{K_k} g\left(x\right)\ dx
+
+to all integrals that need to be evaluated in the discrete weak form.
+
+.. elaborate on this section
+
+Then the algorithm for the assembly is given by
+
+.. figure:: img/assembly.png
+    :alt: assembly
+    :align: center
+
+where :math:`\hat{\phi}_i = \phi_i \circ T_k` are the basis functions on the reference element.
+
+At the end of the assembly, we need to account for the Dirichlet boundary constraints, e.g. let a constraint :math:`u_{\tau} = \xi` be given.
+Then we would need to make sure that :math:`(A_h)_{\tau,j} = \delta_{\tau,j}` for all :math:`1 \leq j \leq m`.
+Here :math:`\delta_{\tau,j}` denotes the Kronecker delta, which is defined as
+
+.. math::
+
+  \delta_{\tau,j} := \begin{cases}
+    1 & \text{for } j = \tau \\
+    0 & \text{for } j \neq \tau
+    \end{cases}.
+
+Futhermore, we would need to set :math:`(b_h)_{\tau} = \xi`.
+Obviously these steps ensure that when solving the linear system :math:`A_h x_h = b_h`,
+we get :math:`u_{\tau} = \xi`. In our model problem, we only have homogeneous Dirichlet constraints.
+Thus, we only need to find all indices :math:`\tau` at the Dirichlet boundary :math:`\Gamma_D`
+and apply the procedure from above with :math:`\xi = 0`.
+
+Overall, the Finite Element Method enabled us to transform a discrete form of the convection-diffusion equation
+on a given grid into a linear equation system. In the following, we will investigate how such a linear equation system can be solved iteratively.
 
 Iterative Methods
 ^^^^^^^^^^^^^^^^^
-TODO !!!
+We want to construct an iteration, where each iterate :math:`x_k^{k}` is a better approximation to the linear equation system :math:`A_h x_h = b_h`.
+To measure the quality of our solution, we monitor the :blue:`defect`
 
+.. math::
+  b_h - A_h x_h
+
+and try to minimize it.
+One can try to formulate a fixed point scheme :math:`x_h^{k+1} = g\left(x_h^{k}\right)` to solve the system of equations.
+The goal of the fixed point scheme is to find some input :math:`x` such that :math:`g(x) = x`.
+In our case, we want the exact solution :math:`x_h` to be a fixed point of our iteration.
+We observe that the defect of the exact solution is zero. Thus one might try to increment the old iterate :math:`x_h`
+by some multiple of the defect. This is called the Richardson method. However, the Richardson method is rarely used in practice.
+Instead we will work with the more general fixed point scheme
+
+.. math::
+
+  x_h^{k+1} = x_h^{k} + \omega C^{-1}\left(b_h - A_h x_h^{k} \right)
+
+where :math:`C \in \mathbb{R}^{n_{DoFs} \times n_{DoFs}}`. Here the type of method depends on the matrix :math:`C`, e.g.
+:math:`C = I` is the Richardson method. In our code, we implemented
+
+* :math:`C = D` which is the :math:`\omega`-:blue:`Jacobi` method,
+* :math:`C = \left( D + L \right)` which is the  :blue:`Forward Gauss-Seidel` method for :math:`\omega = 1`,
+* :math:`C = \left( D + U \right)` which is the  :blue:`Backward Gauss-Seidel` method for :math:`\omega = 1`.
+
+In these definitions, we used the decomposition  :math:`A_h = L + D + U`, where :math:`L` has only nonzero entries below the diagonal (strictly lower triangular matrix),
+:math:`D` has only nonzero entries on the diagonal (diagonal matrix) and :math:`U` has only nonzero entries above the diagonal (strictly upper triangular matrix).
+
+Note that we need to compute the inverse matrix :math:`C^{-1}`. This can be easily done for :math:`\omega`-Jacobi,
+since we just invert the diagonal. It wouldn't be efficient to invert :math:`\left( D + L \right)` or :math:`\left( D + U \right)` directly.
+Hence we use the formula
+
+.. math::
+
+  x_i^k = \frac{1}{a_{ii}}\left( b_i - \sum_{j < i}a_{ij}x_j^k - \sum_{j > i}a_{ij}x_j^{k-1} \right) \quad \text{for } i = 1, \dots n_{DoFs}
+
+for Forward Gauss-Seidel and the formula
+
+.. math::
+
+  x_i^k = \frac{1}{a_{ii}}\left( b_i - \sum_{j < i}a_{ij}x_j^{k-1} - \sum_{j > i}a_{ij}x_j^{k} \right) \quad \text{for } i = n_{DoFs},  \dots, 1
+
+for Backward Gauss-Seidel. In these formulas, we used the notation :math:`a_{ij} := (A_h)_{ij}`, :math:`b_{i} := (b_h)_{i}` and :math:`x_i^{k} := (x_h^{k})_i`.
+
+Which of these iterative methods should be used in numerical computations? It depends!
+:math:`\omega`-Jacobi has the benefit of being fast, since it can be parallelized.
+Nevertheless, it needs more iterations to converge than Gauss-Seidel and one needs to choose a good value for :math:`\omega` before computation.
+Although the Gauss-Seidel methods converge in less iterations, they need longer for the computation, since the for loops need to be executed sequentially.
+
+In the next few sections, we will show how :math:`\omega`-Jacobi and Gauss-Seidel can be used in the multigrid method,
+resulting in a fast solver for the linear equation system derived from a discrete weak form of the convection-diffusion equation.
 
 Grid Setup
 ^^^^^^^^^^
@@ -140,7 +361,7 @@ The grid consists of objects of type :code:`Node`, :code:`Edge` and :code:`Trian
     :alt: coarse_grid
     :align: center
 
-.. centered:: Figure 2: Coarse grid (:math:`\mathbb{T}_0`)
+.. centered:: Figure 3: Coarse grid (:math:`\mathbb{T}_0`)
 
 For the multigrid method, we need a sequence of such grids.
 In this work, we restrict our analysis to uniformly refined meshes.
@@ -151,10 +372,10 @@ and then refine them.
     :alt: triangle_refinement
     :align: center
 
-.. centered:: Figure 3: Refining a triangle
+.. centered:: Figure 4: Refining a triangle
 
 To refine a triangle one simply needs to bisect all of its edges and draw a new triangle out of these three new nodes.
-As shown in figure 3, through the refinement process a triangle is being divided
+As shown in figure 4, through the refinement process a triangle is being divided
 into four smaller triangles. Each :code:`Node` object needs to know its parent nodes.
 The parents are two end nodes of the edge that has been bisected, e.g. node 1 and node 2 are the parents of node 4.
 In the literature [1] these relationships are being stored in a father-son list.
@@ -168,7 +389,7 @@ refine the coarse grid to construct that grid.
     :alt: grid_level_1
     :align: center
 
-.. centered:: Figure 4: Grid on level 1 (:math:`\mathbb{T}_1`)
+.. centered:: Figure 5: Grid on level 1 (:math:`\mathbb{T}_1`)
 
 We continue the process of refining the grid, until we end up with a grid, which has enough nodes
 to ensure that a sufficiently good approximation to the exact solution can be computed.
@@ -177,7 +398,7 @@ to ensure that a sufficiently good approximation to the exact solution can be co
     :alt: grid_level_2
     :align: center
 
-.. centered:: Figure 5: Grid on level 2 (:math:`\mathbb{T}_2`)
+.. centered:: Figure 6: Grid on level 2 (:math:`\mathbb{T}_2`)
 
 The grid on the highest level, in this case :math:`\mathbb{T}_2` or more generally :math:`\mathbb{T}_L`, is called the finest grid
 and will be used to assemble the system matrix.
@@ -264,7 +485,7 @@ For :math:`\mu = 1` we get the V-cycle
    }
 
 
-.. centered:: Figure 6: V-cycle
+.. centered:: Figure 7: V-cycle
 
 and for :math:`\mu = 2` we get the W-cycle.
 
@@ -323,7 +544,7 @@ and for :math:`\mu = 2` we get the W-cycle.
    \draw[->] (N) to (O);
    }
 
-.. centered:: Figure 7: W-cycle
+.. centered:: Figure 8: W-cycle
 
 In the figures of these schemes, white circles stand for :math:`\nu` steps of an iterative solver,
 black circles represent a direct solver, blue arrows illustrate a restriction and green arrows illustrate a prolongation.
@@ -373,7 +594,7 @@ it is helpful to a see how the the grid transfer works for one dimensional linea
       :alt: grid_transfer
       :align: center
 
-  .. centered:: Figure 8: Basis functions on the first two levels
+  .. centered:: Figure 9: Basis functions on the first two levels
 
   It holds
 
@@ -444,3 +665,4 @@ References
 #. Dietrich Braess. *Finite Elemente.* Springer Berlin Heidelberg, 2013. DOI: 10.1007/978-3-642-34797-9. URL: `https://doi.org/10.1007%2F978-3-642-34797-9 <https://doi.org/10.1007%2F978-3-642-34797-9>`__.
 #. Chao Chen. "Geometric multigrid for eddy current problems". PhD thesis. 2012.
 #. Julian Roth. "Geometric Multigrid Methods for Maxwell's Equations". Bachelor thesis. 2020.
+#. T. Richter and T. Wick. Einführung in die numerische Mathematik - Begriffe, Konzepte und zahlreiche Anwendungsbeispiele. Springer, 2017.
