@@ -33,7 +33,3 @@ If you still want to do that, follow these steps:
      make clean html
 
 The documentation is now built and can be viewed by opening ``documentation/build/html/index.html``.
-
-.. warning::
-
-   TODO: Delete this section before presentation!!!

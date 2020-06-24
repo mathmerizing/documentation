@@ -255,31 +255,68 @@ In our framework we have implemented the loss functions:
 Mean Squared Error
 ------------------
 The Mean Squared Error (MSE) describes the :math:`L^2`-error between the predictions of
-the neural network and the expected outputs. TO DO !!!
+the neural network and the expected outputs.
 
 .. math::
 
-   \text{MSE}(X;W,b) := \frac{1}{2|X|} \sum_{x \in X} ||NN(x;W,b) - y(x)||^2
+   \text{MSE}(X) := \frac{1}{2|X|} \sum_{x \in X} ||\text{NN}(x) - y(x)||^2
 
+This kind of loss function can be used for regression tasks and we will for example use the Mean Squared Error when training denoising autoencoders.
 
 Crossentropy
 ------------
+Given that the output of the neural network resembles a probability distribution, i.e. all output values are between 0 and 1,
+then we can use the Cross Entropy loss function. This is often being used for object classification tasks, since then a binary classifier is being trained for each object class.
+Hence all output values are between 0 and 1, where 0 means "doesn't belong to the class" and 1 stands for "belongs to the class".
+Thus we can use Crossentropy for our loss, since the output of the neural network is being forced to either be close to 0 or close to 1.
+
+.. math::
+
+   \text{Crossentropy}(X) := -\frac{1}{|X|} \sum_{x \in X} \Big[ y(x) \ln \left(\text{NN}(x) \right) + (1 - y(x)) \ln \left(1 - \text{NN}(x) \right) \Big]
 
 Optimizers
 ^^^^^^^^^^
 TO DO
 
-Dataset
-^^^^^^^
-TO DO
 
 Code: Training a Classifier
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-TODO: description
+First we need to import all of our custom classes, which are needed to create a classifier.
 ::
 
    >>> from nn import MLP
    >>> from layers import Dense
+   >>> from activations import ReLU, Softmax
+   >>> from loss import CrossEntropy
+   >>> from dataset import Dataset
+   >>> from optimizer import Adam
+
+Then we import the MNIST dataset which contains grayscale images of shape 28x28.
+It consists of 60,000 training samples and 10,000 test samples.
+We chose a batch size of 50.
+::
+
+   >>> dataset = Dataset(name = "mnist", train_size = 60000, test_size = 10000, batch_size = 50)
+
+Our classifier is a Multi-Layer Perceptron with 784 neurons in the input layer, 100 neurons and 50 neurons in the hidden layer,
+as well as 10 neurons in the output layer. We need 10 output neurons, since the classes of the digits have been one-hot encoded, i.e.
+:math:`\scriptsize 0\ \hat{=}\ \begin{pmatrix} 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \end{pmatrix}^T`,
+:math:`\scriptsize 1\ \hat{=}\ \begin{pmatrix} 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \end{pmatrix}^T`, etc.
+In most layers we use the ReLU activation function and in the output layer we use the Softmax function, since it outputs a probability distribution over the digits.
+All weights are being trained with the Adam optimizer, since it performed better than Stochastic Gradient Descent.
+::
+
    >>> classifier = MLP()
    >>> optimizer = Adam(0.1)
-   >>> ...
+   >>> classifier.addLayer(Dense(inputDim = 28 * 28, outputDim = 100, activation = ReLU(), optimizer = optimizer))
+   >>> classifier.addLayer(Dense(inputDim = 100, outputDim = 50, activation = ReLU(), optimizer = optimizer))
+   >>> classifier.addLayer(Dense(inputDim = 50, outputDim = 10, activation = Softmax(), optimizer = optimizer))
+
+Finally, we can start our training loop in which we are tring to minimize the Crossentropy loss.
+We are using 10 epochs, which means that the classifier is being trained on the entire training set 10 times.
+We also monitor these losses on the training and test set. Additionally, we log the predicition accuracy on the training and test set.
+::
+
+   >>> classifier.train(dataset,loss = CrossEntropy(), epochs = 10, metrics = ["train_loss", "test_loss", "train_accuracy", "test_accuracy"], tensorboard = False, callbacks = {})
+
+After training this classifier, which has been created with less than 15 lines of code, we can correctly predict handwritten digits in more than 97 % of the cases.
