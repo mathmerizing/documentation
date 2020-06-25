@@ -105,8 +105,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#crossentropy">Crossentropy</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#optimizers">Optimizers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optimizers">Optimizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stochastic-gradient-descent">Stochastic Gradient Descent</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adam">Adam</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#code-training-a-classifier">Code: Training a Classifier</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="classifier_demo.html">Multi-Layer Perceptron: Classification of handwritten digits (MNIST)</a></li>
@@ -376,8 +381,8 @@ is about its prediction. That is we would like some output like:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">Softmax</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
 <p>Activation functions can also be added to dense layers. If no activation function is
 specified, the layer uses the Sigmoid function. E.g. you can add ReLU to a dense layer via</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">layers</span> <span class="kn">import</span> <span class="n">Dense</span>
@@ -403,6 +408,10 @@ the neural network and the expected outputs.</p>
 <div class="math notranslate nohighlight">
 \[\text{MSE}(X) := \frac{1}{2|X|} \sum_{x \in X} ||\text{NN}(x) - y(x)||^2\]</div>
 <p>This kind of loss function can be used for regression tasks and we will for example use the Mean Squared Error when training denoising autoencoders.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">loss</span> <span class="kn">import</span> <span class="n">MSE</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="crossentropy">
 <h3>Crossentropy<a class="headerlink" href="#crossentropy" title="Permalink to this headline">¶</a></h3>
@@ -412,11 +421,57 @@ Hence all output values are between 0 and 1, where 0 means “doesn’t belong t
 Thus we can use Crossentropy for our loss, since the output of the neural network is being forced to either be close to 0 or close to 1.</p>
 <div class="math notranslate nohighlight">
 \[\text{Crossentropy}(X) := -\frac{1}{|X|} \sum_{x \in X} \Big[ y(x) \ln \left(\text{NN}(x) \right) + (1 - y(x)) \ln \left(1 - \text{NN}(x) \right) \Big]\]</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">loss</span> <span class="kn">import</span> <span class="n">CrossEntropy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">loss</span> <span class="o">=</span> <span class="n">CrossEntropy</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>A loss function needs to be specified when training the neural network.</p>
+</div>
 </div>
 </div>
 <div class="section" id="optimizers">
 <h2>Optimizers<a class="headerlink" href="#optimizers" title="Permalink to this headline">¶</a></h2>
-<p>TO DO</p>
+<p>Neural networks have a vast amount of parameters which can be tweaked such that a task, like for example object recognition, can be learned.
+How should we choose these parameters such that the neural networks excels at its task?
+An intuitive approach would be to brute force the optimal parameters or use an evolutionary algorithm.
+This is also being done in practice when working with tiny networks where only a few dozen parameters need to be tuned.
+For example, genetic algorithms like NEAT can be used to create programs that can play simple jump and run games like Super Mario.
+However, we are interested in tasks where we need neural networks with in the order of a million parameters.
+Thus, we instead use gradient based optimization methods like Stochastic Gradient Descent or Adam.</p>
+<p>Let <span class="math notranslate nohighlight">\(\theta\)</span> denote the parameters of a neural network. In our case <span class="math notranslate nohighlight">\(\theta\)</span> consists of the weights and biases of the individual layers.
+Furthermore, let <span class="math notranslate nohighlight">\(\eta\)</span> be the learning rate which dictates how much the parameters can be changed.</p>
+<div class="section" id="stochastic-gradient-descent">
+<h3>Stochastic Gradient Descent<a class="headerlink" href="#stochastic-gradient-descent" title="Permalink to this headline">¶</a></h3>
+<p>A key oservation is that differentiable increase the most in the direction of the gradient.
+Thus we would like to go in the opposite direction of the gradient, since there the function decreases the most.
+When scaling the gradient with the learning rate, we get the Gradient Descent algorithm</p>
+<div class="math notranslate nohighlight">
+\[\theta^{\text{new}} = \theta - \eta \nabla_{\theta} \operatorname{Loss}_{\theta}(X).\]</div>
+<p>From the theoretical point of view, one should always compute the gradient of loss function evaluated on the entire training set.
+This is rarely advisable in practice, since it is computationally to expensive to evaluate the loss on the entire training set.
+Hence, the training set is being divided into smaller chunks called mini-batches and the parameters are being updated by only evaluating the gradient of the loss on a single mini-batch.
+This approach is being referred to as Stochastic Gradient Descent (SGD).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">optimizer</span> <span class="kn">import</span> <span class="n">SGD</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">(</span><span class="n">learningRate</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">momentum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="adam">
+<h3>Adam<a class="headerlink" href="#adam" title="Permalink to this headline">¶</a></h3>
+<p>TO DO !!!</p>
+<div class="admonition-note admonition">
+<p class="admonition-title">Note</p>
+<p>Optimizers can also be added to dense layers. If no optimizer is
+specified, the layer uses Adam. E.g. you can use Stochastic Gradient Descent via</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">optimizers</span> <span class="kn">import</span> <span class="n">SGD</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">denseLayer</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">inputDim</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">outputDim</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">(</span><span class="n">learningRate</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 <div class="section" id="code-training-a-classifier">
 <h2>Code: Training a Classifier<a class="headerlink" href="#code-training-a-classifier" title="Permalink to this headline">¶</a></h2>
@@ -455,6 +510,14 @@ We also monitor these losses on the training and test set. Additionally, we log 
 </pre></div>
 </div>
 <p>After training this classifier, which has been created with less than 15 lines of code, we can correctly predict handwritten digits in more than 97 % of the cases.</p>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Aurélien Géron. <em>Hands-On Machine Learning with Scikit-Learn and TensorFlow: Concepts, Tools, and Techniques to Build Intelligent Systems.</em> 1st. O’Reilly Media, Inc., 2017. ISBN: 978-1-491-96229-9.</p></li>
+<li><p>Michael A. Nielsen. <em>Neural Networks and Deep Learning.</em> Determination Press, 2015.</p></li>
+<li><p>Diederik P. Kingma and Jimmy Ba. <em>Adam: A Method for Stochastic Optimization.</em> 2014. arXiv: 1412.6980 [cs.LG].</p></li>
+</ol>
 </div>
 </div>
 

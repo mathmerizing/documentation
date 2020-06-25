@@ -231,7 +231,7 @@ This type of prediction can be achieved with the formula
    >>> from activations import Softmax
    >>> f = Softmax()
 
-.. tip::
+.. admonition:: Note
 
   Activation functions can also be added to dense layers. If no activation function is
   specified, the layer uses the Sigmoid function. E.g. you can add ReLU to a dense layer via
@@ -263,6 +263,12 @@ the neural network and the expected outputs.
 
 This kind of loss function can be used for regression tasks and we will for example use the Mean Squared Error when training denoising autoencoders.
 
+::
+
+   >>> from loss import MSE
+   >>> loss = MSE()
+
+
 Crossentropy
 ------------
 Given that the output of the neural network resembles a probability distribution, i.e. all output values are between 0 and 1,
@@ -274,10 +280,63 @@ Thus we can use Crossentropy for our loss, since the output of the neural networ
 
    \text{Crossentropy}(X) := -\frac{1}{|X|} \sum_{x \in X} \Big[ y(x) \ln \left(\text{NN}(x) \right) + (1 - y(x)) \ln \left(1 - \text{NN}(x) \right) \Big]
 
+::
+
+   >>> from loss import CrossEntropy
+   >>> loss = CrossEntropy()
+
+.. admonition:: Note
+
+  A loss function needs to be specified when training the neural network.
+
 Optimizers
 ^^^^^^^^^^
-TO DO
+Neural networks have a vast amount of parameters which can be tweaked such that a task, like for example object recognition, can be learned.
+How should we choose these parameters such that the neural networks excels at its task?
+An intuitive approach would be to brute force the optimal parameters or use an evolutionary algorithm.
+This is also being done in practice when working with tiny networks where only a few dozen parameters need to be tuned.
+For example, genetic algorithms like NEAT can be used to create programs that can play simple jump and run games like Super Mario.
+However, we are interested in tasks where we need neural networks with in the order of a million parameters.
+Thus, we instead use gradient based optimization methods like Stochastic Gradient Descent or Adam.
 
+Let :math:`\theta` denote the parameters of a neural network. In our case :math:`\theta` consists of the weights and biases of the individual layers.
+Furthermore, let :math:`\eta` be the learning rate which dictates how much the parameters can be changed.
+
+Stochastic Gradient Descent
+---------------------------
+A key oservation is that differentiable increase the most in the direction of the gradient.
+Thus we would like to go in the opposite direction of the gradient, since there the function decreases the most.
+When scaling the gradient with the learning rate, we get the Gradient Descent algorithm
+
+.. math::
+
+   \theta^{\text{new}} = \theta - \eta \nabla_{\theta} \operatorname{Loss}_{\theta}(X).
+
+From the theoretical point of view, one should always compute the gradient of loss function evaluated on the entire training set.
+This is rarely advisable in practice, since it is computationally to expensive to evaluate the loss on the entire training set.
+Hence, the training set is being divided into smaller chunks called mini-batches and the parameters are being updated by only evaluating the gradient of the loss on a single mini-batch.
+This approach is being referred to as Stochastic Gradient Descent (SGD).
+
+::
+
+   >>> from optimizer import SGD
+   >>> optimizer = SGD(learningRate = 0.01, momentum = 0)
+
+Adam
+----
+TO DO !!!
+
+
+.. admonition:: Note
+
+  Optimizers can also be added to dense layers. If no optimizer is
+  specified, the layer uses Adam. E.g. you can use Stochastic Gradient Descent via
+
+  ::
+
+     >>> from layers import Dense
+     >>> from optimizers import SGD
+     >>> denseLayer = Dense(inputDim = 3, outputDim = 4, optimizer = SGD(learningRate = 0.01))
 
 Code: Training a Classifier
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -320,3 +379,9 @@ We also monitor these losses on the training and test set. Additionally, we log 
    >>> classifier.train(dataset,loss = CrossEntropy(), epochs = 10, metrics = ["train_loss", "test_loss", "train_accuracy", "test_accuracy"], tensorboard = False, callbacks = {})
 
 After training this classifier, which has been created with less than 15 lines of code, we can correctly predict handwritten digits in more than 97 % of the cases.
+
+References
+^^^^^^^^^^
+#. Aurélien Géron. *Hands-On Machine Learning with Scikit-Learn and TensorFlow: Concepts, Tools, and Techniques to Build Intelligent Systems.* 1st. O’Reilly Media, Inc., 2017. ISBN: 978-1-491-96229-9.
+#. Michael A. Nielsen. *Neural Networks and Deep Learning.* Determination Press, 2015.
+#. Diederik P. Kingma and Jimmy Ba. *Adam: A Method for Stochastic Optimization.* 2014. arXiv: 1412.6980 [cs.LG].
