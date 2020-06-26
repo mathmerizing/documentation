@@ -460,7 +460,17 @@ This approach is being referred to as Stochastic Gradient Descent (SGD).</p>
 </div>
 <div class="section" id="adam">
 <h3>Adam<a class="headerlink" href="#adam" title="Permalink to this headline">¶</a></h3>
-<p>TO DO !!!</p>
+<p>The Adam optimizer[3] tries to fix the shortcomings of gradient descent by
+introducing adaptive learning rates. Effectively this optimizer is a combination
+of AdaGrad and RMSProp.</p>
+<div class="figure align-center" id="id6">
+<img alt="adam" src="images/Adam.png" />
+<p class="caption"><span class="caption-text">Algorithm from the original Adam paper[3]</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">optimizer</span> <span class="kn">import</span> <span class="n">Adam</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="n">learningRate</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">beta_1</span> <span class="o">=</span> <span class="mf">0.9</span><span class="p">,</span> <span class="n">beta_2</span> <span class="o">=</span> <span class="mf">0.999</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="admonition-note admonition">
 <p class="admonition-title">Note</p>
 <p>Optimizers can also be added to dense layers. If no optimizer is
@@ -497,7 +507,7 @@ as well as 10 neurons in the output layer. We need 10 output neurons, since the 
 In most layers we use the ReLU activation function and in the output layer we use the Softmax function, since it outputs a probability distribution over the digits.
 All weights are being trained with the Adam optimizer, since it performed better than Stochastic Gradient Descent.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classifier</span> <span class="o">=</span> <span class="n">MLP</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="n">learningRate</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">classifier</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">inputDim</span> <span class="o">=</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span><span class="p">,</span> <span class="n">outputDim</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">(),</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">classifier</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">inputDim</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">outputDim</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="n">ReLU</span><span class="p">(),</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">classifier</span><span class="o">.</span><span class="n">addLayer</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">inputDim</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">outputDim</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="n">Softmax</span><span class="p">(),</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">))</span>

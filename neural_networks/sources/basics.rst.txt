@@ -324,7 +324,20 @@ This approach is being referred to as Stochastic Gradient Descent (SGD).
 
 Adam
 ----
-TO DO !!!
+The Adam optimizer[3] tries to fix the shortcomings of gradient descent by
+introducing adaptive learning rates. Effectively this optimizer is a combination
+of AdaGrad and RMSProp.
+
+.. figure:: img/Adam.png
+    :alt: adam
+    :align: center
+
+    Algorithm from the original Adam paper[3]
+
+::
+
+   >>> from optimizer import Adam
+   >>> optimizer = Adam(learningRate = 0.001, beta_1 = 0.9, beta_2 = 0.999)
 
 
 .. admonition:: Note
@@ -366,7 +379,7 @@ All weights are being trained with the Adam optimizer, since it performed better
 ::
 
    >>> classifier = MLP()
-   >>> optimizer = Adam(0.1)
+   >>> optimizer = Adam(learningRate = 0.1)
    >>> classifier.addLayer(Dense(inputDim = 28 * 28, outputDim = 100, activation = ReLU(), optimizer = optimizer))
    >>> classifier.addLayer(Dense(inputDim = 100, outputDim = 50, activation = ReLU(), optimizer = optimizer))
    >>> classifier.addLayer(Dense(inputDim = 50, outputDim = 10, activation = Softmax(), optimizer = optimizer))

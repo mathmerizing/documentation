@@ -214,7 +214,7 @@
 <dd><p>Bases: <a class="reference internal" href="#NumNeurNet.optimizer.Optimizer" title="NumNeurNet.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.optimizer.Optimizer</span></code></a></p>
 <dl class="py method">
 <dt id="NumNeurNet.optimizer.Adam.optimize">
-<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">variableGradient</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.Adam.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">variableGradient</span></em>, <em class="sig-param"><span class="n">t</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.Adam.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a vectorized Adam routine.</p>
 <p>STILL TO DO (explanation)</p>
 <div class="math notranslate nohighlight">
@@ -262,7 +262,7 @@ to the output layer in a neural network.</p>
 <dd><p>Bases: <a class="reference internal" href="#NumNeurNet.optimizer.Optimizer" title="NumNeurNet.optimizer.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumNeurNet.optimizer.Optimizer</span></code></a></p>
 <dl class="py method">
 <dt id="NumNeurNet.optimizer.SGD.optimize">
-<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">variableGradient</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.SGD.optimize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">variable</span></em>, <em class="sig-param"><span class="n">variableGradient</span></em>, <em class="sig-param"><span class="n">t</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#NumNeurNet.optimizer.SGD.optimize" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a vectorized stochastic gradient descent routine.</p>
 <p>Like before, the activated outputs a and the errors <span class="math notranslate nohighlight">\(\delta\)</span> are matrices,
 where <span class="math notranslate nohighlight">\(\delta^l\)</span> equals contains the columns <span class="math notranslate nohighlight">\(\delta^{x,l}\)</span>, which are
