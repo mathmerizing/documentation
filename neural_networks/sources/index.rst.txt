@@ -17,7 +17,7 @@ in the summer semester 2020 at the Leibniz Universität Hannover by Prof. Thomas
    basics
    classifier_demo.ipynb
    autoencoder_demo.ipynb
-   GAN_demo.ipynb
+   gan_demo.ipynb
    license
    help
 
