@@ -1,0 +1,701 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Generative Adversarial Networks: Creating new numbers &mdash; Autoencoder 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
+        <script src="static/jquery.js"></script>
+        <script src="static/underscore.js"></script>
+        <script src="static/doctools.js"></script>
+        <script src="static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="Denoising Autoencoder: Removing noise from the MNIST dataset" href="autoencoder_demo.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Autoencoder
+          
+
+          
+            
+            <img src="static/MLP.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Table of Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started: Overview &amp; Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics.html">Basics of Deep Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_demo.html">Multi-Layer Perceptron: Classification of handwritten digits (MNIST)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="autoencoder_demo.html">Denoising Autoencoder: Removing noise from the MNIST dataset</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Generative Adversarial Networks: Creating new numbers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Imports">Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Theory">Theory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Demo">Demo</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Autoencoder</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Generative Adversarial Networks: Creating new numbers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="sources/gan_demo.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container,
+div.nbinput.container div.prompt,
+div.nbinput.container div.input_area,
+div.nbinput.container div[class*=highlight],
+div.nbinput.container div[class*=highlight] pre,
+div.nboutput.container,
+div.nboutput.container div.prompt,
+div.nboutput.container div.output_area,
+div.nboutput.container div[class*=highlight],
+div.nboutput.container div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    min-width: 5ex;
+    padding-top: 0.3rem;
+    padding-right: 0.3rem;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 0.3rem;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Generative-Adversarial-Networks:-Creating-new-numbers">
+<h1>Generative Adversarial Networks: Creating new numbers<a class="headerlink" href="#Generative-Adversarial-Networks:-Creating-new-numbers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># importing functions and classes from our framework</span>
+<span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">gan</span> <span class="kn">import</span> <span class="n">GAN</span>
+<span class="kn">from</span> <span class="nn">layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="c1"># other imports</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">333</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Theory">
+<h2>Theory<a class="headerlink" href="#Theory" title="Permalink to this headline">¶</a></h2>
+<p>To be able to understand how a Generative Adversarial Network (GAN) works, let us first start with a similar phenomenon from the real world. Try to imagine that you are an owner of a world-renowned art auction house. Your clients are collecting master pieces of infamous painters, like Pablo Picasso or Vincent Van Gogh. These paintings have very high price tags and thus it has become very lucrative to create cheap replicas. Some of them have even found a way into your auctions. To ensure that
+your clients receive the original paintings and not some cheap knock-offs, you then ask a friend who has taken some art classes in college to be the judge whether paintings are replicas or the real deal. Fortunately for you, the criminals in your area don’t know too much about art and your friend can sometimes identify forged paintings. A few months pass and your friend doesn’t seem to be able to distinguish between real and fake paintings any more. Furthermore, you now receive a lot of angry
+letters of your clients which want their money back, since they didn’t want to buy an art forgery. After thinking for a while, you come to the conclusion that the criminals must have gotten better at forging paintings and that your friend’s art classes probably are not sufficient to differentiate between replicas and originals any more. Thus, you hire an art expert to teach your friend the ropes of the art business. Now he is able to detect forgeries again with a decent accuracy, but the
+criminals are not procrastinating either and are improving their painting skills every day. This power struggle goes back and forth for a long time, until your friend has become an art expert and the criminals have become exceptionally proficient at forging paintings. But what has this story to do with neural networks?</p>
+<p>A GAN consists of two neural networks: a generator - the painting forging criminals - and a discriminator - the friend that tries to distinguish whether a painting is real or fake. We will continue by explaining how GANs work by working with the MNIST dataset of handwritten digits. The generator and the discriminator play a minimax game where the generator wants to fool the discriminator and the discriminator wants to detect fakes. This can be expressed in the loss function</p>
+<center><p><span class="math notranslate nohighlight">\(\underset{G}{\min} \underset{D}{\max} \operatorname{Loss}(D,G) = \mathbb{E}_{x \sim p_{\text{data}}(x)}[\log D(x)] + \mathbb{E}_{z \sim p_{z}(z)}[\log (1- D(G(z)))].\)</span></p>
+</center><p>Thus we can see that: - the discriminator D tries to label images from the MNIST dataset as real, i.e. learns to assign them a value of 1 - the discriminator D tries to label images that ARE NOT in the MNIST dataset as fake, i.e. learns to assign them a value of 0 - the generator G tries to create images that the discriminator D labels as real, i.e. tries to create images which the discriminator then assigns a value of 1</p>
+</div>
+<div class="section" id="Demo">
+<h2>Demo<a class="headerlink" href="#Demo" title="Permalink to this headline">¶</a></h2>
+<p>Now we load a GAN that has been trained on the MNIST dataset. The generator and the discriminator are multi-layer perceptrons.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gan</span> <span class="o">=</span> <span class="n">GAN</span><span class="p">()</span>
+<span class="n">gan</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;mnist_gan&quot;</span><span class="p">)</span> <span class="c1"># gan is saved in &#39;/models/mnist_gan&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gan</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-------------------- GENERATIVE ADVERSARIAL NETWORK (GAN) --------------------
+
+TOTAL PARAMETERS = 2946577
+
+#################
+#   GENERATOR   #
+#################
+
+ *** 1. Layer: ***
+---------------------------------
+DENSE 100 -&gt; 256 [LeakyReLU_0.2]
+---------------------------------
+Total parameters: 25856
+---&gt; WEIGHTS: (256, 100)
+---&gt; BIASES: (256,)
+---------------------------------
+
+ *** 2. Layer: ***
+---------------------------------
+DENSE 256 -&gt; 512 [LeakyReLU_0.2]
+---------------------------------
+Total parameters: 131584
+---&gt; WEIGHTS: (512, 256)
+---&gt; BIASES: (512,)
+---------------------------------
+
+ *** 3. Layer: ***
+----------------------------------
+DENSE 512 -&gt; 1024 [LeakyReLU_0.2]
+----------------------------------
+Total parameters: 525312
+---&gt; WEIGHTS: (1024, 512)
+---&gt; BIASES: (1024,)
+----------------------------------
+
+ *** 4. Layer: ***
+-------------------------
+DENSE 1024 -&gt; 784 [Tanh]
+-------------------------
+Total parameters: 803600
+---&gt; WEIGHTS: (784, 1024)
+---&gt; BIASES: (784,)
+-------------------------
+
+#####################
+#   DISCRIMINATOR   #
+#####################
+
+ *** 1. Layer: ***
+----------------------------------
+DENSE 784 -&gt; 1024 [LeakyReLU_0.2]
+----------------------------------
+Total parameters: 803840
+---&gt; WEIGHTS: (1024, 784)
+---&gt; BIASES: (1024,)
+----------------------------------
+
+ *** 2. Layer: ***
+----------------------------------
+DENSE 1024 -&gt; 512 [LeakyReLU_0.2]
+----------------------------------
+Total parameters: 524800
+---&gt; WEIGHTS: (512, 1024)
+---&gt; BIASES: (512,)
+----------------------------------
+
+ *** 3. Layer: ***
+---------------------------------
+DENSE 512 -&gt; 256 [LeakyReLU_0.2]
+---------------------------------
+Total parameters: 131328
+---&gt; WEIGHTS: (256, 512)
+---&gt; BIASES: (256,)
+---------------------------------
+
+ *** 4. Layer: ***
+-------------------------
+DENSE 256 -&gt; 1 [Sigmoid]
+-------------------------
+Total parameters: 257
+---&gt; WEIGHTS: (1, 256)
+---&gt; BIASES: (1,)
+-------------------------
+
+----------------------------------------------------------------------
+
+</pre></div></div>
+</div>
+<p>GANs are, as the name suggests, generative models. Hence training it on handwritten digits, we would expect, that it can come up with new numbers by itself. It is difficult to train GANs (see <a class="reference external" href="https://towardsdatascience.com/10-lessons-i-learned-training-generative-adversarial-networks-gans-for-a-year-c9071159628">GANs Lessons</a>) and we haven’t implemented regularizers like dropout or batch normalization. Hence we don’t have optimal results. Training a GAN is a highly unstable optimization
+problem and it is difficult to find the equilibrium between the discriminator and the generator.</p>
+<p>It can be seen that the plain output of the generator looks very noisy. This is partially also caused by the activation function in the output layer, which we chose to be the hyperbolic tangent. Thus the output values are between -1 and 1, but usually we would like grayscale values between 0 and 1 (or between 0 and 255).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ganImage</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">gan</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ganImage</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="images/gan_demo_13_0.png" src="images/gan_demo_13_0.png" />
+</div>
+</div>
+<p>To achieve proper scaling of the image, i.e. values between 0 and 1, we apply ReLU on the entire image.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">((</span><span class="n">ganImage</span> <span class="o">*</span> <span class="p">(</span><span class="n">ganImage</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="images/gan_demo_15_0.png" src="images/gan_demo_15_0.png" />
+</div>
+</div>
+<p>In the previous parts of our project, we have seen that denoising autoencoders are very effective in filtering noise out of images. Hence, we will use a denoising autoencoder after our discriminator to generate noise-free digits.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">autoencoder</span> <span class="kn">import</span> <span class="n">Autoencoder</span>
+
+<span class="n">ae</span> <span class="o">=</span> <span class="n">Autoencoder</span><span class="p">()</span>
+<span class="n">ae</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;ae_gans&quot;</span><span class="p">)</span> <span class="c1"># ae is saved in &#39;/models/ae_gans&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ae</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+-------------------- MULTI LAYER PERCEPTRON (MLP) --------------------
+
+HIDDEN LAYERS = 0
+TOTAL PARAMETERS = 79234
+
+ *** 1. Layer: ***
+-----------------------
+DENSE 784 -&gt; 50 [ReLU]
+-----------------------
+Total parameters: 39250
+---&gt; WEIGHTS: (50, 784)
+---&gt; BIASES: (50,)
+-----------------------
+
+ *** 2. Layer: ***
+--------------------------
+DENSE 50 -&gt; 784 [Sigmoid]
+--------------------------
+Total parameters: 39984
+---&gt; WEIGHTS: (784, 50)
+---&gt; BIASES: (784,)
+--------------------------
+
+----------------------------------------------------------------------
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ae</span><span class="o">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">ganImage</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="images/gan_demo_18_0.png" src="images/gan_demo_18_0.png" />
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="license.html" class="btn btn-neutral float-right" title="License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="autoencoder_demo.html" class="btn btn-neutral float-left" title="Denoising Autoencoder: Removing noise from the MNIST dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Julian Roth, Max Schröder, Annika Heil, Yerso Checya Sinti
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
