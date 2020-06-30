@@ -1,7 +1,0 @@
-NumNeurNet.nn module
-====================
-
-.. automodule:: NumNeurNet.nn
-   :members:
-   :undoc-members:
-   :show-inheritance:

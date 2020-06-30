@@ -1,7 +1,0 @@
-NumNeurNet
-==========
-
-.. toctree::
-   :maxdepth: 4
-
-   NumNeurNet
