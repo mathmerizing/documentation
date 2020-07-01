@@ -92,7 +92,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation-guide">Installation guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-requirements">Install requirements:</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#build-documentation">Build documentation:</a></li>
 </ul>
 </li>
 </ul>
@@ -195,11 +194,25 @@
 <h1>Getting started: Overview &amp; Installation<a class="headerlink" href="#getting-started-overview-installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>TODO…</p>
+<p>This is a small neural network framework that has been created from scratch.
+It relies mainly on <a class="reference external" href="https://numpy.org/">NumPy</a> for efficient operations on n-dimensional arrays.
+Being a team of only 4 developers, we restricted the functionality to the following neural network architectures:</p>
+<ul class="simple">
+<li><p>Multi-Layer Perceptrons (MLP)</p></li>
+<li><p>(Denoising) Autoencoders (AE)</p></li>
+<li><p>Variational Autoencoders (VAE)</p></li>
+<li><p>Generative Adversarial Networks (GAN)</p></li>
+</ul>
+<p>Hence in the next pages of this online documentation, we will briefly recapitulate the basics of deep learning
+and show how the fundamental building blocks of Multi-Layer Perceptrons have been implemented in our framework.
+Then we will continue with a few demos of the afore-mentioned neural network architectures and give some insights in the theory behind these models.</p>
 </div>
 <div class="section" id="installation-guide">
 <h2>Installation guide<a class="headerlink" href="#installation-guide" title="Permalink to this headline">¶</a></h2>
-<p>Clone repository: TODO…</p>
+<p>Clone repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mathmerizing</span><span class="o">/</span><span class="n">Autoencoder</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
 <div class="section" id="install-requirements">
 <h3>Install requirements:<a class="headerlink" href="#install-requirements" title="Permalink to this headline">¶</a></h3>
 <p>Open a terminal in the repository folder and execute</p>
@@ -210,24 +223,6 @@
 <p class="admonition-title">Note</p>
 <p>Please let us know, if we forgot to list some dependencies or if you have any problems with the installation.</p>
 </div>
-</div>
-<div class="section" id="build-documentation">
-<h3>Build documentation:<a class="headerlink" href="#build-documentation" title="Permalink to this headline">¶</a></h3>
-<p>Building the documentation yourself is not necessary, since we have already done that for you.
-If you still want to do that, follow these steps:</p>
-<ol class="arabic">
-<li><p>If you added some files, navigate to the folder <code class="docutils literal notranslate"><span class="pre">documentation</span></code> and run</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sphinx</span><span class="o">-</span><span class="n">apidoc</span> <span class="o">--</span><span class="n">separate</span> <span class="o">-</span><span class="n">a</span> <span class="o">-</span><span class="n">o</span> <span class="o">./</span><span class="n">source</span> <span class="o">..</span>
-</pre></div>
-</div>
-</li>
-<li><p>Then go to the folder <code class="docutils literal notranslate"><span class="pre">documentation</span></code> and execute the command</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">clean</span> <span class="n">html</span>
-</pre></div>
-</div>
-</li>
-</ol>
-<p>The documentation is now built and can be viewed by opening <code class="docutils literal notranslate"><span class="pre">documentation/build/html/index.html</span></code>.</p>
 </div>
 </div>
 </div>
