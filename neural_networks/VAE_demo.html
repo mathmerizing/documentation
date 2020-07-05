@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Generative Adversarial Networks: Creating new numbers &mdash; Autoencoder 1.0.0 documentation</title>
+  <title>VAE: Creating new handwritten numbers based on MNIST &mdash; Autoencoder 1.0.0 documentation</title>
   
 
   
@@ -38,8 +38,8 @@
   <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="License" href="license.html" />
-    <link rel="prev" title="VAE: Creating new handwritten numbers based on MNIST" href="VAE_demo.html" /> 
+    <link rel="next" title="Generative Adversarial Networks: Creating new numbers" href="gan_demo.html" />
+    <link rel="prev" title="Denoising Autoencoder: Removing noise from the MNIST dataset" href="autoencoder_demo.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,13 +92,14 @@
 <li class="toctree-l1"><a class="reference internal" href="basics.html">Basics of Deep Learning</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classifier_demo.html">Multi-Layer Perceptron: Classification of handwritten digits (MNIST)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="autoencoder_demo.html">Denoising Autoencoder: Removing noise from the MNIST dataset</a></li>
-<li class="toctree-l1"><a class="reference internal" href="VAE_demo.html">VAE: Creating new handwritten numbers based on MNIST</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Generative Adversarial Networks: Creating new numbers</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">VAE: Creating new handwritten numbers based on MNIST</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#Imports">Imports</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Theory">Theory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Demo">Demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#References">References</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="gan_demo.html">Generative Adversarial Networks: Creating new numbers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
 </ul>
@@ -146,13 +147,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Generative Adversarial Networks: Creating new numbers</li>
+      <li>VAE: Creating new handwritten numbers based on MNIST</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="sources/gan_demo.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="sources/VAE_demo.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -407,8 +408,8 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<div class="section" id="Generative-Adversarial-Networks:-Creating-new-numbers">
-<h1>Generative Adversarial Networks: Creating new numbers<a class="headerlink" href="#Generative-Adversarial-Networks:-Creating-new-numbers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="VAE:-Creating-new-handwritten-numbers-based-on-MNIST">
+<h1>VAE: Creating new handwritten numbers based on MNIST<a class="headerlink" href="#VAE:-Creating-new-handwritten-numbers-based-on-MNIST" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this headline">¶</a></h2>
 <div class="nbinput nblast docutils container">
@@ -416,39 +417,36 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1"># importing functions and classes from our framework</span>
-<span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">gan</span> <span class="kn">import</span> <span class="n">GAN</span>
-<span class="kn">from</span> <span class="nn">layers</span> <span class="kn">import</span> <span class="n">Dense</span>
-<span class="c1"># other imports</span>
+<span></span><span class="kn">from</span> <span class="nn">dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">nn</span> <span class="kn">import</span> <span class="n">MLP</span>
+<span class="kn">from</span> <span class="nn">vae</span> <span class="kn">import</span> <span class="n">VAE</span><span class="p">,</span> <span class="n">Sampler</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">333</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="Theory">
 <h2>Theory<a class="headerlink" href="#Theory" title="Permalink to this headline">¶</a></h2>
-<p>To be able to understand how a Generative Adversarial Network (GAN) works, let us first start with a similar phenomenon from the real world. Try to imagine that you are an owner of a world-renowned art auction house. Your clients are collecting master pieces of infamous painters, like Pablo Picasso or Vincent Van Gogh. These paintings have very high price tags and thus it has become very lucrative to create cheap replicas. Some of them have even found a way into your auctions. To ensure that
-your clients receive the original paintings and not some cheap knock-offs, you then ask a friend who has taken some art classes in college to be the judge whether paintings are replicas or the real deal. Fortunately for you, the criminals in your area don’t know too much about art and your friend can sometimes identify forged paintings. A few months pass and your friend doesn’t seem to be able to distinguish between real and fake paintings any more. Furthermore, you now receive a lot of angry
-letters of your clients which want their money back, since they didn’t want to buy an art forgery. After thinking for a while, you come to the conclusion that the criminals must have gotten better at forging paintings and that your friend’s art classes probably are not sufficient to differentiate between replicas and originals any more. Thus, you hire an art expert to teach your friend the ropes of the art business. Now he is able to detect forgeries again with a decent accuracy, but the
-criminals are not procrastinating either and are improving their painting skills every day. This power struggle goes back and forth for a long time, until your friend has become an art expert and the criminals have become exceptionally proficient at forging paintings. But what has this story to do with neural networks?</p>
-<p>A GAN consists of two neural networks: a generator - the painting forging criminals - and a discriminator - the friend that tries to distinguish whether a painting is real or fake. We will continue by explaining how GANs work by working with the MNIST dataset of handwritten digits. The generator and the discriminator play a minimax game where the generator wants to fool the discriminator and the discriminator wants to detect fakes. This can be expressed in the loss function</p>
-<center><p><span class="math notranslate nohighlight">\(\underset{G}{\min} \underset{D}{\max} \operatorname{Loss}(D,G) = \mathbb{E}_{x \sim p_{\text{data}}(x)}[\log D(x)] + \mathbb{E}_{z \sim p_{z}(z)}[\log (1- D(G(z)))].\)</span></p>
-</center><p>Thus we can see that: - the discriminator D tries to label images from the MNIST dataset as real, i.e. learns to assign them a value of 1 - the discriminator D tries to label images that ARE NOT in the MNIST dataset as fake, i.e. learns to assign them a value of 0 - the generator G tries to create images that the discriminator D labels as real, i.e. tries to create images which the discriminator then assigns a value of 1</p>
+<p>The main motivation behind variational autoencoders is to construct a generator that produces new meaningful data from scratch. So how does it work? Simply put, it takes the structure of an autoencoder, i.e. it takes an input x, computes a lower dimensional representation of x which can then be reconstructed to an outuput that is very similar to x and additionally the lower dimensional representation of the whole dataset is well organized such that the different classes of the data are
+concentrated in distinct heap points. This ensures that when trying to generate new data one can just sample in the region of those heap points in the lower dimensional space and use the decoder to transform the samples to the shape of our data. Similar samples in the lower dimensional space should result in the same class of data which means that our new synthetic data is meaningful and not just random noise. Thus a variational autoencoder satisfies two main conditions: the autoencoder property
+and an organized lower dimensional space. Those aspects can be directly observed in the Loss function:</p>
+<center><p><span class="math notranslate nohighlight">\(C\|x - \hat x\| + D_{KL}\Big(\mathcal{N}(g(x),h(x)),\mathcal{N}(0,I)\Big)\)</span></p>
+</center><p>Here the first term calculates the error for input and output pairs and thus ensures the autoencoder property. The second term is composed of the Kullback-Leibler divergence of two normal distributions which means some sort of distance or error is calculated for those two. Hence it is ensured that the lower dimensional space follows a multivariate standard normal distirbution and is thus well organized.</p>
 </div>
 <div class="section" id="Demo">
 <h2>Demo<a class="headerlink" href="#Demo" title="Permalink to this headline">¶</a></h2>
-<p>Now we load a GAN that has been trained on the MNIST dataset. The generator and the discriminator are multi-layer perceptrons.</p>
+<p>Firstly we load our pre-trained variational autoencoder model:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">gan</span> <span class="o">=</span> <span class="n">GAN</span><span class="p">()</span>
-<span class="n">gan</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;mnist_gan&quot;</span><span class="p">)</span> <span class="c1"># gan is saved in &#39;/models/mnist_gan&#39;</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">gan</span><span class="p">)</span>
+<span></span><span class="c1">#load model</span>
+<span class="n">vae</span> <span class="o">=</span> <span class="n">VAE</span><span class="p">()</span>
+<span class="n">vae</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;mnist_variational_autoencoder&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">vae</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -457,104 +455,96 @@ criminals are not procrastinating either and are improving their painting skills
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
--------------------- GENERATIVE ADVERSARIAL NETWORK (GAN) --------------------
+-------------------- VARIATIONAL AUTOENCODER (VAE) --------------------
 
-TOTAL PARAMETERS = 2946577
+TOTAL PARAMETERS = 427344
 
-#################
-#   GENERATOR   #
-#################
+###############
+#   ENCODER   #
+###############
 
  *** 1. Layer: ***
----------------------------------
-DENSE 100 -&gt; 256 [LeakyReLU_0.2]
----------------------------------
-Total parameters: 25856
----&gt; WEIGHTS: (256, 100)
+------------------------
+DENSE 784 -&gt; 256 [ReLU]
+------------------------
+Total parameters: 200960
+---&gt; WEIGHTS: (256, 784)
 ---&gt; BIASES: (256,)
----------------------------------
+------------------------
+
+###############
+#   SAMPLER   #
+###############
+
+ *** MEAN Layer: ***
+---------------------------
+DENSE 256 -&gt; 32 [Identity]
+---------------------------
+Total parameters: 8224
+---&gt; WEIGHTS: (32, 256)
+---&gt; BIASES: (32,)
+---------------------------
+
+ *** LOG_VAR Layer: ***
+---------------------------
+DENSE 256 -&gt; 32 [Identity]
+---------------------------
+Total parameters: 8224
+---&gt; WEIGHTS: (32, 256)
+---&gt; BIASES: (32,)
+---------------------------
+
+###############
+#   DECODER   #
+###############
+
+ *** 1. Layer: ***
+-----------------------
+DENSE 32 -&gt; 256 [ReLU]
+-----------------------
+Total parameters: 8448
+---&gt; WEIGHTS: (256, 32)
+---&gt; BIASES: (256,)
+-----------------------
 
  *** 2. Layer: ***
----------------------------------
-DENSE 256 -&gt; 512 [LeakyReLU_0.2]
----------------------------------
-Total parameters: 131584
----&gt; WEIGHTS: (512, 256)
----&gt; BIASES: (512,)
----------------------------------
-
- *** 3. Layer: ***
-----------------------------------
-DENSE 512 -&gt; 1024 [LeakyReLU_0.2]
-----------------------------------
-Total parameters: 525312
----&gt; WEIGHTS: (1024, 512)
----&gt; BIASES: (1024,)
-----------------------------------
-
- *** 4. Layer: ***
--------------------------
-DENSE 1024 -&gt; 784 [Tanh]
--------------------------
-Total parameters: 803600
----&gt; WEIGHTS: (784, 1024)
+---------------------------
+DENSE 256 -&gt; 784 [Sigmoid]
+---------------------------
+Total parameters: 201488
+---&gt; WEIGHTS: (784, 256)
 ---&gt; BIASES: (784,)
--------------------------
-
-#####################
-#   DISCRIMINATOR   #
-#####################
-
- *** 1. Layer: ***
-----------------------------------
-DENSE 784 -&gt; 1024 [LeakyReLU_0.2]
-----------------------------------
-Total parameters: 803840
----&gt; WEIGHTS: (1024, 784)
----&gt; BIASES: (1024,)
-----------------------------------
-
- *** 2. Layer: ***
-----------------------------------
-DENSE 1024 -&gt; 512 [LeakyReLU_0.2]
-----------------------------------
-Total parameters: 524800
----&gt; WEIGHTS: (512, 1024)
----&gt; BIASES: (512,)
-----------------------------------
-
- *** 3. Layer: ***
----------------------------------
-DENSE 512 -&gt; 256 [LeakyReLU_0.2]
----------------------------------
-Total parameters: 131328
----&gt; WEIGHTS: (256, 512)
----&gt; BIASES: (256,)
----------------------------------
-
- *** 4. Layer: ***
--------------------------
-DENSE 256 -&gt; 1 [Sigmoid]
--------------------------
-Total parameters: 257
----&gt; WEIGHTS: (1, 256)
----&gt; BIASES: (1,)
--------------------------
+---------------------------
 
 ----------------------------------------------------------------------
 
 </pre></div></div>
 </div>
-<p>GANs are, as the name suggests, generative models. Hence training it on handwritten digits, we would expect, that it can come up with new numbers by itself. It is difficult to train GANs (see <a class="reference external" href="https://towardsdatascience.com/10-lessons-i-learned-training-generative-adversarial-networks-gans-for-a-year-c9071159628">GANs Lessons</a>) and we haven’t implemented regularizers like dropout or batch normalization. Hence we don’t have optimal results. Training a GAN is a highly unstable optimization
-problem and it is difficult to find the equilibrium between the discriminator and the generator.</p>
-<p>It can be seen that the plain output of the generator looks very noisy. This is partially also caused by the activation function in the output layer, which we chose to be the hyperbolic tangent. Thus the output values are between -1 and 1, but usually we would like grayscale values between 0 and 1 (or between 0 and 255).</p>
+<p>Next we load our MNIST dataset</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#load dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mnist&quot;</span><span class="p">,</span> <span class="n">train_size</span> <span class="o">=</span> <span class="mi">60000</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">original</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">batches</span><span class="p">())[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#load a random handwritten image</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">vae</span><span class="o">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">original</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here we can see, what a forward pass through our model does. It looks quite similar to what we’d expect form a normal Autoencoder.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ganImage</span> <span class="o">=</span> <span class="n">gan</span><span class="o">.</span><span class="n">generator</span><span class="o">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">gan</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ganImage</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span></span><span class="c1">#example of feedforward pass</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Original&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;VAE&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -563,16 +553,31 @@ problem and it is difficult to find the equilibrium between the discriminator an
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="images/gan_demo_13_0.png" src="images/gan_demo_13_0.png" />
+<img alt="images/VAE_demo_13_0.png" src="images/VAE_demo_13_0.png" />
 </div>
 </div>
-<p>To achieve proper scaling of the image, i.e. values between 0 and 1, we apply ReLU on the entire image.</p>
+<p>Here we can observe, what VAEs are all about. We extrapolate from “new” objects in our latent space an image, which is simmilar to it’s two parent images. Thereby we can create new digit-like images.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">((</span><span class="n">ganImage</span> <span class="o">*</span> <span class="p">(</span><span class="n">ganImage</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span></span><span class="c1">#extrapolating from latent space:</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">11</span>
+
+<span class="n">latent1</span> <span class="o">=</span> <span class="n">vae</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">sample</span>
+<span class="n">vae</span><span class="o">.</span><span class="n">feedforward</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">batches</span><span class="p">())[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">latent2</span> <span class="o">=</span> <span class="n">vae</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">sample</span>
+
+
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">20</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">(</span><span class="n">latent1</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">latent2</span> <span class="o">*</span> <span class="n">i</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">vae</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
+
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -581,72 +586,17 @@ problem and it is difficult to find the equilibrium between the discriminator an
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="images/gan_demo_15_0.png" src="images/gan_demo_15_0.png" />
+<img alt="images/VAE_demo_15_0.png" src="images/VAE_demo_15_0.png" />
 </div>
 </div>
-<p>In the previous parts of our project, we have seen that denoising autoencoders are very effective in filtering noise out of images. Hence, we will use a denoising autoencoder after our discriminator to generate noise-free digits.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
-</pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">autoencoder</span> <span class="kn">import</span> <span class="n">Autoencoder</span>
-
-<span class="n">ae</span> <span class="o">=</span> <span class="n">Autoencoder</span><span class="p">()</span>
-<span class="n">ae</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;ae_gans&quot;</span><span class="p">)</span> <span class="c1"># ae is saved in &#39;/models/ae_gans&#39;</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ae</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
--------------------- MULTI LAYER PERCEPTRON (MLP) --------------------
-
-HIDDEN LAYERS = 0
-TOTAL PARAMETERS = 79234
-
- *** 1. Layer: ***
------------------------
-DENSE 784 -&gt; 50 [ReLU]
------------------------
-Total parameters: 39250
----&gt; WEIGHTS: (50, 784)
----&gt; BIASES: (50,)
------------------------
-
- *** 2. Layer: ***
---------------------------
-DENSE 50 -&gt; 784 [Sigmoid]
---------------------------
-Total parameters: 39984
----&gt; WEIGHTS: (784, 50)
----&gt; BIASES: (784,)
---------------------------
-
-----------------------------------------------------------------------
-
-</pre></div></div>
-</div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ae</span><span class="o">.</span><span class="n">feedforward</span><span class="p">(</span><span class="n">ganImage</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="images/gan_demo_18_0.png" src="images/gan_demo_18_0.png" />
-</div>
-</div>
+<div class="section" id="References">
+<h2>References<a class="headerlink" href="#References" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Diederik P Kingma and Max Welling. Auto-Encoding Variational Bayes. 2013. arXiv: 1312.6114 [stat.ML]</p></li>
+<li><p><a class="reference external" href="https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73">https://towardsdatascience.com/understanding-variational-autoencoders-vaes-f70510919f73</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pometa0507/Variational-Autoencoder-Numpy">https://github.com/pometa0507/Variational-Autoencoder-Numpy</a></p></li>
+</ol>
 </div>
 </div>
 
@@ -658,10 +608,10 @@ Total parameters: 39984
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="license.html" class="btn btn-neutral float-right" title="License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="gan_demo.html" class="btn btn-neutral float-right" title="Generative Adversarial Networks: Creating new numbers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="VAE_demo.html" class="btn btn-neutral float-left" title="VAE: Creating new handwritten numbers based on MNIST" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="autoencoder_demo.html" class="btn btn-neutral float-left" title="Denoising Autoencoder: Removing noise from the MNIST dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
