@@ -5,21 +5,21 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <title>Basics of Geometric Multigrid &mdash; Multigrid 1.0.0 documentation</title>
-  
 
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
   <script type="text/javascript" src="static/js/modernizr.min.js"></script>
-  
-    
+
+
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="static/documentation_options.js"></script>
         <script src="static/jquery.js"></script>
         <script src="static/underscore.js"></script>
@@ -28,46 +28,46 @@
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
-    
+
     <script type="text/javascript" src="static/js/theme.js"></script>
 
-    
 
-  
+
+
   <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Results of Multigrid for Convection Diffusion" href="Multigrid.html" />
-    <link rel="prev" title="Welcome to Multigrid’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to Multigrid’s documentation!" href="index.html" />
 </head>
 
 <body class="wy-body-for-nav">
 
-   
+
   <div class="wy-grid-for-nav">
-    
+
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
-          
+
+
             <a href="index.html" class="icon icon-home"> Multigrid
-          
 
-          
-            
+
+
+
             <img src="static/logo.png" class="logo" alt="Logo"/>
-          
+
           </a>
 
-          
-            
-            
-          
 
-          
+
+
+
+
+
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,16 +76,16 @@
   </form>
 </div>
 
-          
+
         </div>
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+
+
+
+
+
+
               <p class="caption"><span class="caption-text">Table of Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Basics of Geometric Multigrid</a><ul>
@@ -105,28 +105,28 @@
 <li class="toctree-l1"><a class="reference internal" href="help.html">Help</a></li>
 </ul>
 
-            
-          
+
+
         </div>
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
-      
+
       <nav class="wy-nav-top" aria-label="top navigation">
-        
+
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Multigrid</a>
-        
+
       </nav>
 
 
       <div class="wy-nav-content">
-        
+
         <div class="rst-content">
-        
-          
+
+
 
 
 
@@ -145,29 +145,29 @@
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
-    
+
       <li><a href="index.html">Docs</a> &raquo;</li>
-        
+
       <li>Basics of Geometric Multigrid</li>
-    
-    
+
+
       <li class="wy-breadcrumbs-aside">
-        
-            
+
+
             <a href="sources/basics.rst.txt" rel="nofollow"> View page source</a>
-          
-        
+
+
       </li>
-    
+
   </ul>
 
-  
+
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  
+
+
 <style>
 /* CSS overrides for sphinx_rtd_theme */
 
@@ -200,7 +200,7 @@ which for certain problems yields an iterative solver
 with optimal cost complexity, i.e. the solver returns a solution to a PDE in
 <span class="math notranslate nohighlight">\(O(n_{\text{DoFs}})\)</span> arithmetic operations. We will show that this can also
 be achieved for some reaction-diffusion equations on uniformly refined triangular
-meshes, when discretizing with linear finite elements.</p>
+meshes, when discretizing with linear finite elements. The Python code for this project can be found at <a href="https://github.com/mathmerizing/MultigridPython">https://github.com/mathmerizing/MultigridPython</a>.</p>
 </div>
 <div class="section" id="problem-setup">
 <h2>Problem setup<a class="headerlink" href="#problem-setup" title="Permalink to this headline">¶</a></h2>
@@ -700,19 +700,19 @@ but here <span class="red">all Dirichlet boundary conditions are set to be homog
 
 
            </div>
-           
+
           </div>
           <footer>
-  
+
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+
         <a href="Multigrid.html" class="btn btn-neutral float-right" title="Results of Multigrid for Convection Diffusion" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
+
+
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to Multigrid’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+
     </div>
-  
+
 
   <hr/>
 
@@ -722,7 +722,7 @@ but here <span class="red">all Dirichlet boundary conditions are set to be homog
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 
 </footer>
 
@@ -732,7 +732,7 @@ but here <span class="red">all Dirichlet boundary conditions are set to be homog
     </section>
 
   </div>
-  
+
 
 
   <script type="text/javascript">
@@ -741,10 +741,10 @@ but here <span class="red">all Dirichlet boundary conditions are set to be homog
       });
   </script>
 
-  
-  
-    
-   
+
+
+
+
 
 </body>
 </html>
