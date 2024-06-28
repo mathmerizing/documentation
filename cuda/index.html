@@ -1,13 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Julian Roth</title>
-<meta name='viewport' content='width=device-width, initial-scale=1'>
-<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css'>
-<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js'></script>
-<script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js'></script>
-<style>
-</style></head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Julian Roth</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
 <body>
+    <h1 class="text-center">Introduction to CUDA programming</h1>
+    <hr style="width:80%;">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Introduction</h2>
+                <p>
+                    <a href="https://docs.nvidia.com/cuda/">CUDA</a> (Compute Unified Device Architecture) is a parallel computing platform and application programming interface (API) model created by NVIDIA. It allows software developers to use a CUDA-enabled graphics processing unit (GPU) for general purpose processing – an approach known as GPGPU (General-Purpose computing on Graphics Processing Units). The CUDA platform is a software layer that gives direct access to the GPU's virtual instruction set and parallel computational elements, for the execution of compute kernels.
+                </p>
+            </div>
+            <div class="col-md-6">
+                <h2>Getting Started</h2>
+                <p>
+                    To get started with CUDA programming, you will need to install the <a href="https://developer.nvidia.com/cuda-toolkit">CUDA Toolkit</a> on your system. The CUDA Toolkit is a software package that includes everything you need to develop CUDA applications. It includes the CUDA C compiler, libraries, and tools for developing, debugging, and optimizing your CUDA code.
+                </p>
+                <p>
+                    You can download the CUDA Toolkit from the Nvidia website. Once you have installed the CUDA Toolkit, you can start writing CUDA programs using the <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide">CUDA C</a> programming language. CUDA C is an extension of the C programming language that includes special keywords and features for programming GPUs.
+                </p>
+                <p>
+                    To compile and run a CUDA program, you will need to use the nvcc compiler, which is included with the CUDA Toolkit. The nvcc compiler takes CUDA C source code and generates an executable that can be run on a CUDA-enabled GPU.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Compilation process</h2>
+                <p>
+                    The compilation process for a CUDA program is similar to that of a regular C program, with a few additional steps. When you compile a CUDA program, the CUDA compiler (nvcc) generates two separate executables: one for the host (CPU) and one for the device (GPU). The host executable is responsible for launching the GPU kernel, while the device executable contains the actual GPU kernel code.
+                </p>
+                <p>
+                    To compile a CUDA program, you can use the following command:
+                </p>
+                <pre>
+                    nvcc -o my_program my_program.cu
+                </pre>
+                <p>
+                    This command compiles the CUDA program in the file my_program.cu and generates an executable called my_program. The resulting executable can be run on a CUDA-enabled GPU.
+                </p>
+                <p>
+                    <img src="NVCC.svg" alt="NVCC Diagram" class="mx-auto d-block">
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>GPU parallelism</h2>
+                <p>
+                    The GPU is a massively parallel processor that is optimized for data-parallel workloads. It consists of multiple <mark>streaming multiprocessors</mark> (SMs), each of which contains multiple <mark>CUDA cores</mark> (also called <mark>streaming processors</mark> (SPs)). The CUDA cores are the basic processing units of the GPU, and they execute the individual threads of a CUDA program.
+                    You may already be familiar with multithreading in CPU programming, where multiple threads are executed concurrently on a multi-core CPU. In GPU programming, the concept is similar, but on a much larger scale. A GPU can have hundreds or thousands of CUDA cores, each of which can execute multiple threads concurrently.
+                    To take advantage of the massive parallelism of the GPU, you need to write your CUDA programs in a way that allows them to be executed efficiently on the GPU. This typically involves breaking your program into many small threads that can be executed in parallel on the GPU.
+                </p>
+                <p>
+                    The CUDA programming model is based on the concept of <mark>threads</mark> and <mark>blocks</mark>. A thread is the smallest unit of execution in a CUDA program, and a block is a group of threads that are executed together on a single SM. The threads within a block can communicate with each other using shared memory, which is a fast, on-chip memory that is shared by all threads in the block. All threads in the <mark>grid</mark> execute the same kernel function.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2><u>Example:</u> Vector addition</h2>
+                <div class="card" style="color:red">
+                    <div class="card-header">
+                        ToDo
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="width:80%;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Useful resources</h2>
+                <h4>Official resources</h4>
+                <ul>
+                    <li><a href="https://docs.nvidia.com/cuda/">CUDA Documentation</a></li>
+                    <li><a href="https://developer.nvidia.com/cuda-toolkit">CUDA Toolkit</a></li>
+                    <li><a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide">CUDA C Programming Guide</a></li>
+                    <li><a href="https://g.co/kgs/c9jTq1z"><i>Programming Massively Parallel Processors</i> book</a></li>
+                </ul>
+                <h4>Additional resources</h4>
+                <ul>
+                    <li><i>CUDA MODE</i> (CUDA reading group): <a href="https://youtube.com/@CUDAMODE">YouTube</a>, <a href="https://discord.gg/cudamode">Discord</a>, <a href="https://github.com/cuda-mode">GitHub</a></li>
+                    <li><a href="https://leimao.github.io/tags/CUDA/">Lei Mao's blog posts on CUDA</a></li>
+                    <li><a href="https://siboehm.com/articles/22/CUDA-MMM">Improving matrix-matrix multiplication in CUDA for cuBLAS-like performance</a></li>
+                    <li><a href="https://github.com/karpathy/llm.c">Implementation of LLMs in pure CUDA (Karpathy et al.)</a></li>
+                </ul>
+            </div>
+        </div>
+    </div> 
 </body>
 </html>
