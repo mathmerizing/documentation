@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        .no-border {
+            border: none !important;
+        }
+    </style>
 </head>
 <body>
     <h1 class="text-center">Introduction to CUDA programming</h1>
@@ -33,9 +39,33 @@
                 </p>
             </div>
         </div>
+        <!-- TABLE OF CONTENTS -->
         <div class="row">
             <div class="col-md-12">
-                <h2>Compilation process</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Table of Contents</h2>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item no-border"><a href="#compilation-process">1. Compilation process</a></li>
+                        <li class="list-group-item no-border"><a href="#gpu-parallelism">2. GPU parallelism</a></li>
+                        <li class="list-group-item no-border">
+                            <a href="#example-vector-addition">3. Example: Vector addition</a><br>
+                            &emsp;<a href="#example-vector-addition-sequential">3.1 Sequential implementation</a><br>
+                            &emsp;<a href="#example-vector-addition-openmp">3.2 OpenMP implementation</a><br>
+                            &emsp;<a href="#example-vector-addition-cuda">3.3 CUDA implementation</a>
+                        </li>
+                        <li class="list-group-item no-border"><a href="#memory-hierarchy">4. Memory hierarchy</a></li>
+                        <li class="list-group-item no-border"><a href="#useful-resources">5. Useful resources</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <br>
+        <hr style="width:60%;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="compilation-process">1. Compilation process</h2>
                 <p>
                     The compilation process for a CUDA program is similar to that of a regular C program, with a few additional steps. When you compile a CUDA program, the CUDA compiler (nvcc) generates two separate executables: one for the host (CPU) and one for the device (GPU). The host executable is responsible for launching the GPU kernel, while the device executable contains the actual GPU kernel code.
                 </p>
@@ -53,9 +83,10 @@
                 </p>
             </div>
         </div>
+        <hr style="width:60%;">
         <div class="row">
             <div class="col-md-12">
-                <h2>GPU parallelism</h2>
+                <h2 id="gpu-parallelism">2. GPU parallelism</h2>
                 <p>
                     The GPU is a massively parallel processor that is optimized for data-parallel workloads. It consists of multiple <mark>streaming multiprocessors</mark> (SMs), each of which contains multiple <mark>CUDA cores</mark> (also called <mark>streaming processors</mark> (SPs)). The CUDA cores are the basic processing units of the GPU, and they execute the individual threads of a CUDA program.
                     You may already be familiar with multithreading in CPU programming, where multiple threads are executed concurrently on a multi-core CPU. In GPU programming, the concept is similar, but on a much larger scale. A GPU can have hundreds or thousands of CUDA cores, each of which can execute multiple threads concurrently.
@@ -66,22 +97,188 @@
                 </p>
             </div>
         </div>
+        <hr style="width:60%;">
         <div class="row">
             <div class="col-md-12">
-                <h2><u>Example:</u> Vector addition</h2>
-                <div class="card" style="color:red">
-                    <div class="card-header">
-                        ToDo
-                    </div>
+                <h2 id="example-vector-addition">3. <u>Example:</u> Vector addition</h2>
+                <p>
+                    The toy example for CUDA programming is vector addition. In this example, we will add two vectors of the same length and store the result in a third vector. Mathematically, the operation can be represented as:
+                    \[
+                        \vec{z} := \begin{pmatrix}z_1 \\ z_2 \\ \vdots \\ z_n \end{pmatrix} = \begin{pmatrix}x_1 \\ x_2 \\ \vdots \\ x_n \end{pmatrix} + \begin{pmatrix}y_1 \\ y_2 \\ \vdots \\ y_n \end{pmatrix} =: \vec{x} + \vec{y}.
+                    \]
+                </p>
+                <h3 id="example-vector-addition-sequential">3.1 Sequential implementation
+                <a href="https://colab.research.google.com/drive/1CVHDuTWEEVYwEoo4sCm_ETnQbLwwfRtd?usp=sharing" class="btn btn-primary" target="_blank">
+                    <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                    Code
+                </a>
+                </h3>
+                <p>
+                    The sequential implementation of vector addition is straightforward. We can write a simple C++ program that adds two vectors element-wise and stores the result in a third vector. The following code snippet shows the sequential implementation of vector addition:
+                </p>
+                <pre>
+                    <code>
+                        void add(int n, float *x, float *y)
+                        {
+                            for (int i = 0; i < n; i++)
+                                y[i] = x[i] + y[i];
+                        }
+                    </code>
+                </pre>
+                <p>
+                    In this code snippet, the add function takes three arguments: n, which is the length of the vectors, and two pointers x and y, which point to the input vectors. The function adds the elements of the two input vectors x and y element-wise and stores the result in the output vector y.
+                </p>
+                <p>
+                    The wall time of the sequential implementation is \(t_{\text{sequential}} = 37\) milliseconds for vectors with 10 million elements.
+                </p>
+                <h3 id="example-vector-addition-openmp">3.2 OpenMP implementation
+                    <a href="https://colab.research.google.com/drive/1-dPRoVTdUzVW6tAvf46qhJLm4sJJG16L?usp=sharing" class="btn btn-primary" target="_blank">
+                        <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                        Code
+                    </a>
+                </h3>
+                <p>
+                    The OpenMP implementation of vector addition parallelizes the operation using multiple threads, but still using only the CPU. The following code snippet shows the OpenMP implementation of vector addition:
+                </p>
+                <pre>
+                    <code>
+                        void add(int n, float *x, float *y)
+                        {
+                            #pragma omp parallel for
+                            for (int i = 0; i < n; i++)
+                                y[i] = x[i] + y[i];
+                        }
+                    </code>
+                </pre>
+                <p>
+                    In this code snippet, the add function is annotated with the OpenMP pragma <code>#pragma omp parallel for</code>, which instructs the compiler to parallelize the for loop using multiple threads. The compiler automatically distributes the iterations of the loop across the available threads, which can improve the performance of the program.
+                </p>
+                <p>
+                    The wall time of the OpenMP implementation is \(t_{\text{OpenMP}} = 24\) milliseconds for vectors with 10 million elements.
+                </p>
+                <h3 id="example-vector-addition-cuda">3.3 CUDA implementation
+                    <a href="https://colab.research.google.com/drive/1qbX77o7jQ7YP71LL-BESS-p8A2pHg2Sv?usp=sharing" class="btn btn-primary" target="_blank">
+                        <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                        Code
+                    </a>
+                </h3>
+                <p>
+                    The CUDA implementation of vector addition parallelizes the operation using the GPU. The following code snippet shows the CUDA implementation of vector addition:
+                </p>
+                <pre>
+                    <code>
+                        __global__ void add(int n, float *x, float *y)
+                        {
+                            int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                            if (idx < n)
+                                y[idx] = x[idx] + y[idx];
+                        }
+                    </code>
+                </pre>
+                <p>
+                    In this code snippet, the add function is annotated with the CUDA keyword <code>__global__</code>, which indicates that the function is a CUDA kernel that will be executed on the GPU.
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Qualifier</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>__host__</code></td>
+                                <td>Indicates that the function is to be executed on the host (CPU). &emsp;[<i>default</i>]</td>
+                            </tr>
+                            <tr>
+                                <td><code>__global__</code></td>
+                                <td>Indicates that the function is a GPU kernel that will be executed on the device (GPU) and can be called from the host.</td>
+                            </tr>
+                            <tr>
+                                <td><code>__device__</code></td>
+                                <td>Indicates that the function is to be executed on the device (GPU) and can only be called from other device or global functions.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </p> 
+                <p>
+                    The CUDA kernel <code>add</code> takes three arguments: n, which is the length of the vectors, and two pointers x and y, which point to the input vectors. The function calculates the index of the current thread using the built-in variables <code>blockIdx.x</code> and <code>threadIdx.x</code>, and adds the elements of the two input vectors x and y element-wise.
+                </p>
+                <p>
+                    To launch the CUDA kernel, you need to specify the number of blocks and threads per block using the &lt;&lt;&lt;...&gt;&gt;&gt; syntax. The following code snippet shows how to launch the CUDA kernel:
+                </p>
+                <pre>
+                    <code>
+                        int blockDim = 256;
+                        int gridDim = ceil((double)N / blockDim);
+                        add&lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt;(N, d_x, d_y);
+                    </code>
+                </pre>
+                <p>
+                    In this code snippet, the blockDim variable specifies the number of threads per block, and the gridDim variable specifies the number of blocks in the grid. The &lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt; syntax is used to launch the CUDA kernel with the specified grid and block dimensions.
+                    Instead of using the for-loop as in the sequential and OpenMP implementations, the CUDA kernel is executed by multiple threads in parallel on the GPU. To subdivide the work among the threads, the vector addition is performed for blocks of size 256 (blockDim) and the number of blocks required is the total number of blocks needed to cover the entire vector, i.e. ceil(N / blockDim) = 39,063 (gridDim) for N = 10 million.
+                    Note that the number of threads per block should be a multiple of 32, as the GPU executes threads in warps of 32 threads each but more on that later.
+                    On another note, the size of the vector is not a multiple of 256, so the last block will have fewer threads than the others. This is handled by the if statement in the CUDA kernel and you might need to play around with the block size to find the optimal performance.
+                </p>
+                <div class="alert alert-info" role="alert">
+                    <strong>Note:</strong> The <code>gridDim</code> and <code>blockDim</code> parameters in the execution configuration can also be <code>dim3</code> objects. This allows you to specify a 3D grid of thread blocks, which can be useful for higher order tensors like matrices. The launch configuration above is equivalent to
+                    <pre>
+                        <code>
+                            dim3 blockDim(256,1,1);
+                            dim3 gridDim(ceil((double)N / blockDim.x),1,1);
+                            add&lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt;(N, d_x, d_y);
+                        </code>
+                    </pre>
+                    That means that the other two dimensions are set to 1 by default.
+                </div>
+                <img src="ThreadBlocks.svg" alt="Thread Blocks Diagram"  class="mx-auto d-block" style="width: 100%;"><br>
+                <p>
+                    Finally, we need to talk about data transfer between the host and the device. 
+                    CUDA requires manual memory management, which means that you need to allocate memory on the device, copy data from the host to the device, launch the CUDA kernel, copy the result back to the host, and free the memory on the device.
+                    To allocate memory on the device, you can use the <code>cudaMalloc</code> function, which allocates a block of memory on the device and returns a pointer to the allocated memory. Then, the input vectors x and y are copied to the device memory using <code>cudaMemcpy</code> before launching the CUDA kernel, and the result vector is copied back to the host memory again with <code>cudaMemcpy</code>  after the kernel has finished executing. Finally, the memory can be freed after the computation. The following code snippet shows how to copy data between the host and device:
+                </p>
+                <pre>
+                    <code>
+                        // Allocate memory on the device
+                        float *d_x, *d_y;
+                        cudaMalloc((void **)&d_x, N * sizeof(float));
+                        cudaMalloc((void **)&d_y, N * sizeof(float));
+                        cudaMemcpy(d_x, h_x, N * sizeof(float), cudaMemcpyHostToDevice);
+                        cudaMemcpy(d_y, h_y, N * sizeof(float), cudaMemcpyHostToDevice);
+                      
+                        // Launch kernel on the GPU
+                        // ...
+
+                        // Copy result back to host
+                        cudaMemcpy(h_y, d_y, N * sizeof(float), cudaMemcpyDeviceToHost);
+                      
+                        // Free memory
+                        cudaFree(d_x);
+                        cudaFree(d_y);
+                    </code>
+                </pre>
+                <p>
+                   We have deliberately omitted the initialization of the input vectors x and y as h_x and h_y on the host, as well as the cleanup of the host memory and the CUDA kernel launch. Note that many developers use <code>h_</code> or <code>_h</code> in their variable names to indicate that they are host memory, and <code>d_</code> or <code>_d</code> for device memory. As a concluding remark, we will see in the next section that data transfer between the host and the device can be expensive and one option to avoid this is to initialize the data directly on the GPU if possible (as in our toy example where the data is known in advance).
+                </p>
+                <p>
+                    The wall time of the CUDA kernel is \(t_{\text{CUDA}} = 0.6\) milliseconds for vectors with 10 million elements on a T4 GPU.
+                </p>
+                <div class="alert alert-warning" role="alert">
+                    <strong>Warning:</strong> Make sure that the runtime of Google Colab is set to use a GPU. Otherwise, the CUDA code will not work.
                 </div>
             </div>
         </div>
-    </div>
+        <hr style="width:60%;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="memory-hierarchy">4. Memory hierarchy</h2>
+                TODO
+            </div>
+        </div>
     <hr style="width:80%;">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2>Useful resources</h2>
+                <h2 id="useful-resources">5. Useful resources</h2>
                 <h4>Official resources</h4>
                 <ul>
                     <li><a href="https://docs.nvidia.com/cuda/">CUDA Documentation</a></li>
