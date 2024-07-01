@@ -56,7 +56,8 @@
                             &emsp;<a href="#example-vector-addition-cuda">3.3 CUDA implementation</a>
                         </li>
                         <li class="list-group-item no-border"><a href="#memory-hierarchy">4. Memory hierarchy</a></li>
-                        <li class="list-group-item no-border"><a href="#useful-resources">5. Useful resources</a></li>
+                        <li class="list-group-item no-border"><a href="#warp-divergence">5. Warp divergence and SIMD</a></li>
+                        <li class="list-group-item no-border"><a href="#useful-resources">6. Useful resources</a></li>
                     </ul>
                 </div>
             </div>
@@ -95,6 +96,16 @@
                 <p>
                     The CUDA programming model is based on the concept of <mark>threads</mark> and <mark>blocks</mark>. A thread is the smallest unit of execution in a CUDA program, and a block is a group of threads that are executed together on a single SM. The threads within a block can communicate with each other using shared memory, which is a fast, on-chip memory that is shared by all threads in the block. All threads in the <mark>grid</mark> execute the same kernel function.
                 </p>
+                <p>
+                    As a rough rule of time, the parallelizable portion of code can run 100x faster on GPU than on CPU. The overall speedup can be calculated by <mark>Amdahl's law</mark> as
+                    \[
+                        \text{Theoretical Speedup} = \frac{1}{(1 - p) + \frac{p}{s}} \overset{e.g. p = 40 \%, s = 3}{=} \frac{1}{(1 - 0.4) + \frac{0.4}{3}} \approx 1.36.
+                    \]
+                    Here, \(p\) is the parallelizable portion of the code and \(s\) is the speedup of the parallelizable portion.
+                </p>
+                <p>
+                    <mark>Data parallelism</mark> is a common form of parallelism in CUDA programming, where the same operation is performed on multiple data elements in parallel. This is achieved by launching multiple threads to process different data elements concurrently. Data parallelism is well-suited for problems that can be parallelized across multiple data elements, such as vector addition, matrix multiplication, and image processing. <br>
+                    <mark>Task parallelism</mark> is another form of parallelism in CUDA programming, where different tasks are executed in parallel. This is achieved by launching multiple blocks of threads to perform different tasks concurrently. Task parallelism is well-suited for problems that can be parallelized across multiple tasks, such as parallel sorting, parallel search, and parallel tree traversal.
             </div>
         </div>
         <hr style="width:60%;">
@@ -271,14 +282,42 @@
         <div class="row">
             <div class="col-md-12">
                 <h2 id="memory-hierarchy">4. Memory hierarchy</h2>
-                TODO
+                <p>
+                    The memory hierarchy in CUDA consists of several levels of memory that have different characteristics in terms of size, speed, and access latency. The memory hierarchy includes the following levels of memory:
+                </p>
+                <ul>
+                    <li><mark>Registers</mark>: Registers are the fastest and smallest type of memory in the memory hierarchy. They are private to each thread and are used to store the thread's local variables and intermediate results. Registers have the lowest access latency of all memory types but are limited in size.
+                    The number of registers per thread can vary, but it's typically in the range of tens to hundreds. The access speed is extremely fast.</li>
+                    <li><mark>Shared memory</mark>: Shared memory is a fast, on-chip memory that is shared by all threads in a block. It is used to store data that needs to be shared among threads in the same block. Shared memory has lower access latency than global memory but is limited in size and is not persistent across kernel launches. Shared memory is typically 16 KB to 64 KB per block of threads. The access speed is very fast, but slower than registers.
+                    </li>
+                    <li><mark>L1 cache</mark>: The L1 cache is a small, on-chip cache that is shared by all threads in a streaming multiprocessor (SM). It is used to cache data from global memory to reduce memory access latency. The L1 cache is managed automatically by the hardware and does not need to be explicitly managed by the programmer. The L1 cache and shared memory share the same hardware. The size of the L1 cache can vary, but it's typically in the range of tens of KBs.</li>
+                    <li><mark>L2 cache</mark>: The L2 cache is a larger, off-chip cache that is shared by all streaming multiprocessors (SMs) on the GPU. It is used to cache data from global memory to reduce memory access latency. The L2 cache is managed automatically by the hardware and does not need to be explicitly managed by the programmer. The size of the L2 cache can vary, but it's typically in the range of hundreds of KBs to a few MBs. The access speed is slower than the L1 cache. </li>
+                    <li><mark>Global memory</mark>: Global memory is the largest and slowest type of memory in the memory hierarchy. It is used to store data that needs to be accessed by all threads in a kernel. Global memory has the highest access latency of all memory types but is persistent across kernel launches.
+                    The size of global memory is the largest and can be up to several GBs. The access speed is the slowest of all memory types.</li>
+                </ul>
+                <p>
+                    Additional memory types include <mark>constant memory</mark> and <mark>texture memory</mark>, which are read-only memory types that have special caching mechanisms to optimize memory access patterns.
+                </p>
+                <img src="MemoryHierarchy.svg" alt="Memory Hierarchy Diagram"  class="mx-auto d-block"><br>
+                <p>
+                    The memory hierarchy in CUDA is designed to optimize memory access patterns and reduce memory access latency. By using the appropriate memory types and optimizing memory access patterns, you can improve the performance of your CUDA programs.
+                </p>
+            </div>
+        </div>
+        <hr style="width:60%;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="warp-divergence">5. Warp divergence and SIMP</h2>
+                <p>
+                    TODO
+                </p>
             </div>
         </div>
     <hr style="width:80%;">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2 id="useful-resources">5. Useful resources</h2>
+                <h2 id="useful-resources">6. Useful resources</h2>
                 <h4>Official resources</h4>
                 <ul>
                     <li><a href="https://docs.nvidia.com/cuda/">CUDA Documentation</a></li>
