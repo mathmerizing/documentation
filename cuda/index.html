@@ -57,7 +57,8 @@
                         </li>
                         <li class="list-group-item no-border"><a href="#memory-hierarchy">4. Memory hierarchy</a></li>
                         <li class="list-group-item no-border"><a href="#warp-divergence">5. Warp divergence and SIMD</a></li>
-                        <li class="list-group-item no-border"><a href="#useful-resources">6. Useful resources</a></li>
+                        <li class="list-group-item no-border"><a href="#coalesced-memory">6. Coalesced memory access</a></li>
+                        <li class="list-group-item no-border"><a href="#useful-resources">7. Useful resources</a></li>
                     </ul>
                 </div>
             </div>
@@ -302,6 +303,11 @@
                 <p>
                     The memory hierarchy in CUDA is designed to optimize memory access patterns and reduce memory access latency. By using the appropriate memory types and optimizing memory access patterns, you can improve the performance of your CUDA programs.
                 </p>
+                <img src="MemoryHierarchyFlashAttention.svg" alt="Memory hierarchy from flash attention paper" class="mx-auto d-block" style="background-color: white;width: 40%;">
+                <center>
+                    Image source: FlashAttention paper (<a href="https://arxiv.org/abs/2205.14135">https://arxiv.org/abs/2205.14135</a>)
+                </center>
+
             </div>
         </div>
         <hr style="width:60%;">
@@ -309,15 +315,77 @@
             <div class="col-md-12">
                 <h2 id="warp-divergence">5. Warp divergence and SIMD</h2>
                 <p>
-                    TODO
+                    In CUDA programming, threads are organized into groups called <mark>warps</mark>. A warp is the smallest unit of execution in a CUDA program and consists of 32 threads. The threads in a warp are executed in <mark>single instruction, multiple data (SIMD)</mark> fashion, which means that all threads in the warp execute the same instruction at the same time on different data elements.
                 </p>
+                <div class="alert alert-info" role="alert">
+                    <strong>Note:</strong> <mark>Single-program multiple-data (SPMD)</mark> is a programming model in which all threads execute the same program but operate on different data. The difference to SIMD is that in SPMD not all threads have to execute the same instruction at the same time.
+                </div>
+                <p>
+                    The SIMD execution model in CUDA allows the GPU to execute multiple threads in parallel on the same instruction, which can improve the performance of the program. However, if the threads in a warp execute different instructions, it is called <mark>warp divergence</mark>, which can reduce the performance of the program.
+                </p>
+                <p>
+                    Warp divergence occurs when the threads in a warp take different paths in the code, such as in an if-else statement. When this happens, the GPU has to execute both paths of the code, which can reduce the efficiency of the SIMD execution model. To avoid warp divergence, it is important to write CUDA programs in a way that minimizes the number of divergent branches and maximizes the number of threads that follow the same path in the code. We will illustrate this with a simple example:
+                </p>
+                <pre>
+                    <code>
+                        __global__ void polar_coord(int n, float *phi, float *z)
+                        {
+                            int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                            if (idx < 2 * n)
+                            {
+                                if (idx % 2 == 0)
+                                    z[idx] = cos(phi[idx / 2]);
+                                else
+                                    z[idx] = sin(phi[idx / 2]);
+                            }
+                        }
+                    </code>
+                </pre>
+                <p>
+                    The full code can be found <a href="https://colab.research.google.com/drive/1x3khAGwwEY__fns5CDvx8ig2aD0mFHpz?usp=sharing">
+                        <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                        here.
+                    </a> In this code snippet, the CUDA kernel <code>polar_coord</code> calculates the polar coordinates of a set of points given their angles \(\varphi\) (phi). The angles are stored in the <code>phi</code> array, and the polar coordinates are stored in the <code>z</code> array. The kernel uses an if-else statement to determine whether to calculate the cosine or sine of the angle based on the index of the thread. This code snippet contains warp divergence because the threads in the warp take different paths in the code based on the value of the idx variable, i.e. all even threads calculate the cosine and all odd threads calculate the sine.
+                </p>
+                <img src="WarpDivergence.svg" alt="Warp Divergence Diagram"  class="mx-auto d-block"><br>
+                <p>
+                    As can be seen from the diagram, in the worst case scenario, the threads in the warp are split into two groups, one group that calculates the cosine and one group that calculates the sine. These groups are executed sequentially, which reduces the efficiency of the SIMD execution model.
+                    The wall time of the CUDA kernel with warp divergence is \(t_{\text{warp divergence}} = 1.38\) milliseconds for vectors with 10 million elements on a T4 GPU.
+                    To avoid warp divergence, you can rewrite the code to eliminate the if-else statement and calculate both the cosine and sine of the angle in parallel. This can be achieved by using a single branch that calculates both values and stores them in the output array. The following code snippet shows how to rewrite the CUDA kernel to avoid warp divergence:
+                </p>
+                <pre>
+                    <code>
+                        __global__ void polar_coord(int n, float *phi, float *z)
+                        {
+                            int idx = 2 * (blockIdx.x * blockDim.x + threadIdx.x);
+                            if (idx < 2 * n)
+                            {
+                                z[idx] = cos(phi[idx / 2]);
+                                z[idx+1] = sin(phi[idx / 2]);
+                            }
+                        }
+                    </code>
+                </pre>
+                <p>
+                    The wall time of the CUDA kernel without warp divergence is \(t_{\text{no divergence}} = 1.10\) milliseconds for vectors with 10 million elements on a T4 GPU.
+                </p>
+                <p> 
+                    Finally, one could also use <code>float2</code> to store the cosine and sine values in a single variable and use CUDA's built-in functions <code>__sinf</code> and <code>__cosf</code> to calculate the sine and cosine values. This would further reduce the number of instructions and improve the performance of the kernel and leads to a wall time of \(t_{\text{fast math}} = 0.97\) milliseconds for vectors with 10 million elements on a T4 GPU.
+                </p>
+            </div>
+        </div>
+        <hr style="width:60%;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="coalesced-memory">6. Coalesced memory access</h2>
+                TODO
             </div>
         </div>
     <hr style="width:80%;">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2 id="useful-resources">6. Useful resources</h2>
+                <h2 id="useful-resources">7. Useful resources</h2>
                 <h4>Official resources</h4>
                 <ul>
                     <li><a href="https://docs.nvidia.com/cuda/">CUDA Documentation</a></li>
