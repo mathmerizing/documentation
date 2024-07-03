@@ -58,7 +58,8 @@
                         <li class="list-group-item no-border"><a href="#memory-hierarchy">4. Memory hierarchy</a></li>
                         <li class="list-group-item no-border"><a href="#warp-divergence">5. Warp divergence and SIMD</a></li>
                         <li class="list-group-item no-border"><a href="#coalesced-memory">6. Coalesced memory access</a></li>
-                        <li class="list-group-item no-border"><a href="#useful-resources">7. Useful resources</a></li>
+                        <li class="list-group-item no-border"><a href="#example-matrix-multiplication">7. Example: Matrix multiplication</a></li>
+                        <li class="list-group-item no-border"><a href="#useful-resources">8. Useful resources</a></li>
                     </ul>
                 </div>
             </div>
@@ -378,6 +379,128 @@
         <div class="row">
             <div class="col-md-12">
                 <h2 id="coalesced-memory">6. Coalesced memory access</h2>
+                <p>
+                    <mark>Coalesced memory access</mark> is a technique which allows optimal usage of the global memory bandwidth. When threads in the same warp access to consecutive locations in the global memory, the most favorable access pattern is achieved.
+                    This is caused by the memory which fetches data from DRAM in so-called bursts. We thus do not fetch a single element but a block of elements. The size of a <mark>DRAM burst</mark> is 32 bytes, which corresponds to the size of a warp (32 threads) in CUDA. If all threads in a warp access consecutive locations in the global memory, the GPU can fetch the data in a single DRAM burst, which maximizes the memory bandwidth.
+                    In the case of non-coalesced memory access, the threads in a warp access non-consecutive locations in the global memory, which results in multiple DRAM bursts being required to fetch the data. This reduces the memory bandwidth and can lead to performance degradation.
+                </p>
+                <p>
+                    Let us consider the following example to better understand coalesced memory access. We have a 2D matrix in the global memory and we want to read it prior to performing some computation. The matrix is stored in row-major layout, which means that the elements of each row are stored consecutively in memory. Let us consider a general 3-by-3 matrix: 
+                </p>
+                <table style="margin-left: auto; margin-right: auto; font-size: 24px; border-collapse: collapse;">
+                    <tr style="background-color: #eeff00;">
+                      <td style="border: 1px solid black;">\(A_{0,0}\)</td>
+                      <td style="border: 1px solid black;">\(A_{0,1}\)</td>
+                      <td style="border: 1px solid black;">\(A_{0,2}\)</td>
+                    </tr>
+                    <tr style="background-color: #00ff00;">
+                      <td style="border: 1px solid black;">\(A_{1,0}\)</td>
+                      <td style="border: 1px solid black;">\(A_{1,1}\)</td>
+                      <td style="border: 1px solid black;">\(A_{1,2}\)</td>
+                    </tr>
+                    <tr style="background-color: #7171f0;">
+                      <td style="border: 1px solid black;">\(A_{2,0}\)</td>
+                      <td style="border: 1px solid black;">\(A_{2,1}\)</td>
+                      <td style="border: 1px solid black;">\(A_{2,2}\)</td>
+                    </tr>
+                </table>
+                <br>
+                <p>
+                    In memory, the matrix is stored in the linearized order:
+                </p>
+                <table style="margin-left: auto; margin-right: auto; font-size: 24px; border-collapse: collapse;">
+                    <tr>
+                        <td style="border: 1px solid black; background-color: #eeff00;">\(A_{0,0}\)</td>
+                        <td style="border: 1px solid black; background-color: #eeff00;">\(A_{0,1}\)</td>
+                        <td style="border: 1px solid black; background-color: #eeff00;">\(A_{0,2}\)</td>
+                        <td style="border: 1px solid black; background-color: #00ff00;">\(A_{1,0}\)</td>
+                        <td style="border: 1px solid black; background-color: #00ff00;">\(A_{1,1}\)</td>
+                        <td style="border: 1px solid black; background-color: #00ff00;">\(A_{1,2}\)</td>
+                        <td style="border: 1px solid black; background-color: #7171f0;">\(A_{2,0}\)</td>
+                        <td style="border: 1px solid black; background-color: #7171f0;">\(A_{2,1}\)</td>
+                        <td style="border: 1px solid black; background-color: #7171f0;">\(A_{2,2}\)</td>
+                    </tr>
+                </table>
+                <br>
+                <p>
+                    Let us now go over two types access patterns of the matrix, if we only have 3 threads.
+                </p> 
+                <div class="row">
+                    <div class="col-md-6">
+                      <p>The first option would be to have a <mark>horizontal access pattern</mark>, where each thread reads a row of the matrix:</p>
+                      <br><br><br>
+                      <img src="HorizontalAccessPattern.svg" alt="Horizontal Access Pattern Diagram" class="mx-auto d-block">
+                      <p>
+                        For the horizontal access pattern, we load the elements of the matrix as follows:
+                        <ul>
+                            <li>Load iteration 1:
+                              <ul>
+                                <li>Thread 1: <span style="border: 1px solid black; background-color: #eeff00; padding: 2px;">\(A_{0,0}\)</span></li>
+                                <li>Thread 2: <span style="border: 1px solid black; background-color: #00ff00; padding: 2px;">\(A_{1,0}\)</span></li>
+                                <li>Thread 3: <span style="border: 1px solid black; background-color: #7171f0; padding: 2px;">\(A_{2,0}\)</span></li>
+                              </ul>
+                            </li>
+                            <li>Load iteration 2:
+                                <ul>
+                                    <li>Thread 1: <span style="border: 1px solid black; background-color: #eeff00; padding: 2px;">\(A_{0,1}\)</span></li>
+                                    <li>Thread 2: <span style="border: 1px solid black; background-color: #00ff00; padding: 2px;">\(A_{1,1}\)</span></li>
+                                    <li>Thread 3: <span style="border: 1px solid black; background-color: #7171f0; padding: 2px;">\(A_{2,1}\)</span></li>
+                                  </ul>
+                            </li>
+                            <li>Load iteration 3:
+                                <ul>
+                                    <li>Thread 1: <span style="border: 1px solid black; background-color: #eeff00; padding: 2px;">\(A_{0,2}\)</span></li>
+                                    <li>Thread 2: <span style="border: 1px solid black; background-color: #00ff00; padding: 2px;">\(A_{1,2}\)</span></li>
+                                    <li>Thread 3: <span style="border: 1px solid black; background-color: #7171f0; padding: 2px;">\(A_{2,2}\)</span></li>
+                                  </ul>
+                            </li>
+                          </ul>
+                        This access pattern is not coalesced, as the threads read non-consecutive locations in the global memory. The threads read the elements of the matrix in a column-wise fashion, which results in multiple DRAM bursts being required to fetch the data.
+                    </p>
+                    </div>
+                    <div class="col-md-6">
+                      <p>The second option would be to have a <mark>vertical access pattern</mark>, where each thread reads a column of the matrix:</p>
+                      <img src="VerticalAccessPattern.svg" alt="Vertical Access Pattern Diagram" class="mx-auto d-block">
+                      <p>
+                        For the vertical access pattern, we load the elements of the matrix as follows:
+                        <ul>
+                            <li>Load iteration 1:
+                              <ul>
+                                <li>Thread 1: <span style="border: 1px solid black; background-color: #eeff00; padding: 2px;">\(A_{0,0}\)</span></li>
+                                <li>Thread 2: <span style="border: 1px solid black; background-color: #eeff00; padding: 2px;">\(A_{0,1}\)</span></li>
+                                <li>Thread 3: <span style="border: 1px solid black; background-color: #eeff00; padding: 2px;">\(A_{0,2}\)</span></li>
+                              </ul>
+                            </li>
+                            <li>Load iteration 2:
+                                <ul>
+                                    <li>Thread 1: <span style="border: 1px solid black; background-color: #00ff00; padding: 2px;">\(A_{1,0}\)</span></li>
+                                    <li>Thread 2: <span style="border: 1px solid black; background-color: #00ff00; padding: 2px;">\(A_{1,1}\)</span></li>
+                                    <li>Thread 3: <span style="border: 1px solid black; background-color: #00ff00; padding: 2px;">\(A_{1,2}\)</span></li>
+                                  </ul>
+                            </li>
+                            <li>Load iteration 3:
+                                <ul>
+                                    <li>Thread 1: <span style="border: 1px solid black; background-color: #7171f0; padding: 2px;">\(A_{2,0}\)</span></li>
+                                    <li>Thread 2: <span style="border: 1px solid black; background-color: #7171f0; padding: 2px;">\(A_{2,1}\)</span></li>
+                                    <li>Thread 3: <span style="border: 1px solid black; background-color: #7171f0; padding: 2px;">\(A_{2,2}\)</span></li>
+                                  </ul>
+                            </li>
+                          </ul>
+                        This access pattern is coalesced, as the threads read consecutive locations in the global memory. The threads read the elements of the matrix in a row-wise fashion, which allows the GPU to fetch the data in a single DRAM burst.
+                    </p>
+                    </div>
+                  </div>
+                <p>
+                    For some applications, it might be difficult to achieve coalesced memory access, especially when the access pattern is not known in advance. In such cases, you can use <mark>shared memory</mark> to manually manage the memory access pattern and improve the performance of your CUDA programs. Shared memory is a fast, on-chip memory that is shared by all threads in a block and can be used to store data that needs to be accessed in a coalesced manner.
+                    This is called <mark>corner turning</mark>, which turns a vertical access pattern (coalesced) into a horizontal one (non-coalesced).
+                    This way you can read the data from the global memory in a coalesced manner into the shared memory and then access the shared memory with the desired access pattern.
+                </p> 
+            </div>
+        </div>
+        <hr style="width:60%;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="example-matrix-multiplication">7. <u>Example:</u> Matrix multiplication</h2>
                 TODO
             </div>
         </div>
@@ -385,7 +508,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2 id="useful-resources">7. Useful resources</h2>
+                <h2 id="useful-resources">8. Useful resources</h2>
                 <h4>Official resources</h4>
                 <ul>
                     <li><a href="https://docs.nvidia.com/cuda/">CUDA Documentation</a></li>
