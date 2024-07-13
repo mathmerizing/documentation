@@ -8,6 +8,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-c.min.js"></script>
     <style>
         .no-border {
             border: none !important;
@@ -47,19 +50,19 @@
                         <h2>Table of Contents</h2>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item no-border"><a href="#compilation-process">1. Compilation process</a></li>
-                        <li class="list-group-item no-border"><a href="#gpu-parallelism">2. GPU parallelism</a></li>
-                        <li class="list-group-item no-border">
+                        <li class="list-group-item no-border"><a href="#compilation-process">1. Compilation process</a><br>
+                        <a href="#gpu-parallelism">2. GPU parallelism</a><br>
                             <a href="#example-vector-addition">3. Example: Vector addition</a><br>
                             &emsp;<a href="#example-vector-addition-sequential">3.1 Sequential implementation</a><br>
                             &emsp;<a href="#example-vector-addition-openmp">3.2 OpenMP implementation</a><br>
-                            &emsp;<a href="#example-vector-addition-cuda">3.3 CUDA implementation</a>
-                        </li>
-                        <li class="list-group-item no-border"><a href="#memory-hierarchy">4. Memory hierarchy</a></li>
-                        <li class="list-group-item no-border"><a href="#warp-divergence">5. Warp divergence and SIMD</a></li>
-                        <li class="list-group-item no-border"><a href="#coalesced-memory">6. Coalesced memory access</a></li>
-                        <li class="list-group-item no-border"><a href="#example-matrix-multiplication">7. Example: Matrix multiplication</a></li>
-                        <li class="list-group-item no-border"><a href="#useful-resources">8. Useful resources</a></li>
+                            &emsp;<a href="#example-vector-addition-cuda">3.3 CUDA implementation</a><br>
+                        <a href="#memory-hierarchy">4. Memory hierarchy</a><br>
+                        <a href="#warp-divergence">5. Warp divergence and SIMD</a><br>
+                        <a href="#coalesced-memory">6. Coalesced memory access</a><br>
+                        <a href="#example-matrix-multiplication">7. Example: Matrix multiplication</a><br>
+                        <a href="#race-condition">8. Race condition and atomic operations</a><br>
+                        <a href="#example-flash-attention">9. Example: Flash attention</a><br>
+                        <a href="#useful-resources">10. Useful resources</a></li>
                     </ul>
                 </div>
             </div>
@@ -130,13 +133,12 @@
                     The sequential implementation of vector addition is straightforward. We can write a simple C++ program that adds two vectors element-wise and stores the result in a third vector. The following code snippet shows the sequential implementation of vector addition:
                 </p>
                 <pre>
-                    <code>
+                    <code class="language-c">
                         void add(int n, float *x, float *y)
                         {
                             for (int i = 0; i < n; i++)
                                 y[i] = x[i] + y[i];
-                        }
-                    </code>
+                        }</code>
                 </pre>
                 <p>
                     In this code snippet, the add function takes three arguments: n, which is the length of the vectors, and two pointers x and y, which point to the input vectors. The function adds the elements of the two input vectors x and y element-wise and stores the result in the output vector y.
@@ -154,14 +156,13 @@
                     The OpenMP implementation of vector addition parallelizes the operation using multiple threads, but still using only the CPU. The following code snippet shows the OpenMP implementation of vector addition:
                 </p>
                 <pre>
-                    <code>
+                    <code class="language-c">
                         void add(int n, float *x, float *y)
                         {
                             #pragma omp parallel for
                             for (int i = 0; i < n; i++)
                                 y[i] = x[i] + y[i];
-                        }
-                    </code>
+                        }</code>
                 </pre>
                 <p>
                     In this code snippet, the add function is annotated with the OpenMP pragma <code>#pragma omp parallel for</code>, which instructs the compiler to parallelize the for loop using multiple threads. The compiler automatically distributes the iterations of the loop across the available threads, which can improve the performance of the program.
@@ -179,14 +180,13 @@
                     The CUDA implementation of vector addition parallelizes the operation using the GPU. The following code snippet shows the CUDA implementation of vector addition:
                 </p>
                 <pre>
-                    <code>
+                    <code class="language-c">
                         __global__ void add(int n, float *x, float *y)
                         {
                             int idx = blockIdx.x * blockDim.x + threadIdx.x;
                             if (idx < n)
                                 y[idx] = x[idx] + y[idx];
-                        }
-                    </code>
+                        }</code>
                 </pre>
                 <p>
                     In this code snippet, the add function is annotated with the CUDA keyword <code>__global__</code>, which indicates that the function is a CUDA kernel that will be executed on the GPU.
@@ -220,11 +220,10 @@
                     To launch the CUDA kernel, you need to specify the number of blocks and threads per block using the &lt;&lt;&lt;...&gt;&gt;&gt; syntax. The following code snippet shows how to launch the CUDA kernel:
                 </p>
                 <pre>
-                    <code>
+                    <code class="language-c">
                         int blockDim = 256;
                         int gridDim = ceil((double)N / blockDim);
-                        add&lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt;(N, d_x, d_y);
-                    </code>
+                        add&lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt;(N, d_x, d_y);</code>
                 </pre>
                 <p>
                     In this code snippet, the blockDim variable specifies the number of threads per block, and the gridDim variable specifies the number of blocks in the grid. The &lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt; syntax is used to launch the CUDA kernel with the specified grid and block dimensions.
@@ -235,11 +234,10 @@
                 <div class="alert alert-info" role="alert">
                     <strong>Note:</strong> The <code>gridDim</code> and <code>blockDim</code> parameters in the execution configuration can also be <code>dim3</code> objects. This allows you to specify a 3D grid of thread blocks, which can be useful for higher order tensors like matrices. The launch configuration above is equivalent to
                     <pre>
-                        <code>
+                        <code class="language-c">
                             dim3 blockDim(256,1,1);
                             dim3 gridDim(ceil((double)N / blockDim.x),1,1);
-                            add&lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt;(N, d_x, d_y);
-                        </code>
+                            add&lt;&lt;&lt;gridDim, blockDim&gt;&gt;&gt;(N, d_x, d_y);</code>
                     </pre>
                     That means that the other two dimensions are set to 1 by default.
                 </div>
@@ -250,7 +248,7 @@
                     To allocate memory on the device, you can use the <code>cudaMalloc</code> function, which allocates a block of memory on the device and returns a pointer to the allocated memory. Then, the input vectors x and y are copied to the device memory using <code>cudaMemcpy</code> before launching the CUDA kernel, and the result vector is copied back to the host memory again with <code>cudaMemcpy</code>  after the kernel has finished executing. Finally, the memory can be freed after the computation. The following code snippet shows how to copy data between the host and device:
                 </p>
                 <pre>
-                    <code>
+                    <code class="language-c">
                         // Allocate memory on the device
                         float *d_x, *d_y;
                         cudaMalloc((void **)&d_x, N * sizeof(float));
@@ -266,8 +264,7 @@
                       
                         // Free memory
                         cudaFree(d_x);
-                        cudaFree(d_y);
-                    </code>
+                        cudaFree(d_y);</code>
                 </pre>
                 <p>
                    We have deliberately omitted the initialization of the input vectors x and y as h_x and h_y on the host, as well as the cleanup of the host memory and the CUDA kernel launch. Note that many developers use <code>h_</code> or <code>_h</code> in their variable names to indicate that they are host memory, and <code>d_</code> or <code>_d</code> for device memory. As a concluding remark, we will see in the next section that data transfer between the host and the device can be expensive and one option to avoid this is to initialize the data directly on the GPU if possible (as in our toy example where the data is known in advance).
@@ -328,7 +325,7 @@
                     Warp divergence occurs when the threads in a warp take different paths in the code, such as in an if-else statement. When this happens, the GPU has to execute both paths of the code, which can reduce the efficiency of the SIMD execution model. To avoid warp divergence, it is important to write CUDA programs in a way that minimizes the number of divergent branches and maximizes the number of threads that follow the same path in the code. We will illustrate this with a simple example:
                 </p>
                 <pre>
-                    <code>
+                    <code class="language-c">
                         __global__ void polar_coord(int n, float *phi, float *z)
                         {
                             int idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -339,8 +336,7 @@
                                 else
                                     z[idx] = sin(phi[idx / 2]);
                             }
-                        }
-                    </code>
+                        }</code>
                 </pre>
                 <p>
                     The full code can be found <a href="https://colab.research.google.com/drive/1x3khAGwwEY__fns5CDvx8ig2aD0mFHpz?usp=sharing">
@@ -355,7 +351,7 @@
                     To avoid warp divergence, you can rewrite the code to eliminate the if-else statement and calculate both the cosine and sine of the angle in parallel. This can be achieved by using a single branch that calculates both values and stores them in the output array. The following code snippet shows how to rewrite the CUDA kernel to avoid warp divergence:
                 </p>
                 <pre>
-                    <code>
+                    <code class="language-c">
                         __global__ void polar_coord(int n, float *phi, float *z)
                         {
                             int idx = 2 * (blockIdx.x * blockDim.x + threadIdx.x);
@@ -364,8 +360,7 @@
                                 z[idx] = cos(phi[idx / 2]);
                                 z[idx+1] = sin(phi[idx / 2]);
                             }
-                        }
-                    </code>
+                        }</code>
                 </pre>
                 <p>
                     The wall time of the CUDA kernel without warp divergence is \(t_{\text{no divergence}} = 1.10\) milliseconds for vectors with 10 million elements on a T4 GPU.
@@ -504,11 +499,25 @@
                 TODO
             </div>
         </div>
+        <hr style="width:60%;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="race-condition">8. Race condition and atomic operations</h2>
+                TODO
+            </div>
+        </div>
+        <hr style="width:60%;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 id="example-flash-attention">9. <u>Example:</u> Flash attention</h2>
+                TODO
+            </div>
+        </div>
     <hr style="width:80%;">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h2 id="useful-resources">8. Useful resources</h2>
+                <h2 id="useful-resources">10. Useful resources</h2>
                 <h4>Official resources</h4>
                 <ul>
                     <li><a href="https://docs.nvidia.com/cuda/">CUDA Documentation</a></li>
