@@ -18,6 +18,7 @@
     </style>
 </head>
 <body>
+    <br>
     <h1 class="text-center">Introduction to CUDA programming</h1>
     <hr style="width:80%;">
 
@@ -503,7 +504,46 @@
         <div class="row">
             <div class="col-md-12">
                 <h2 id="race-condition">8. Race condition and atomic operations</h2>
-                TODO
+                <p>
+                    A common issue in parallel programming is the <mark>race condition</mark>, when the outcome of a program depends on the order in which threads are executed. The simplest example of this is when two threads try to increment the same variable at the same time. 
+                    The following code snippet shows an example of a race condition:
+                </p>
+                <pre>
+                    <code class="language-c">
+                        __global__ void add(int n, float *x, float *y)
+                        {
+                            int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                            if (idx < n)
+                                *y += x[idx];
+                        }</code>
+                </pre>
+                <p>
+                    The full code can be found <a href="https://colab.research.google.com/drive/1UvIr8ZVcQL5-pV8bCFvzs4aVjHaVyegW?usp=sharing">
+                        <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                        here.
+                    </a> In this code snippet, the CUDA kernel <code>add</code> <i>tries</i> to compute the sum of all elements in the input vector <code>x</code> and store the result in the float <code>y</code>. But the code is incorrect because multiple threads are trying to write to the same memory location <code>*y</code> at the same time, which only works if the threads are executed sequentially. Therefore the result will be incorrect and the program will have an undefined behavior since the result depends on the order in which the threads are executed.
+                </p> 
+                <p>
+                    To avoid running into race conditions in your parallel programs, you can use <mark>atomic operations</mark>. Atomic operations are operations that are executed as a single, indivisible unit, which means that no other threads can access the memory location being modified until the operation is complete. This ensures that the memory location is updated correctly and avoids race conditions. For our example, we can use the atomic add operation, which inturn serializes the addition operation applied to the memory location. The following code snippet shows how to use the atomic add operation for the previous example:
+                </p>
+                <pre>
+                    <code class="language-c">
+                        __global__ void add(int n, float *x, float *y)
+                        {
+                            int idx = blockIdx.x * blockDim.x + threadIdx.x;
+                            if (idx < n)
+                                atomicAdd(y, x[idx]);
+                        }</code>
+                </pre>
+                <p>
+                    The atomic add operation <code>atomicAdd</code> ensures that for this example, the additions are performed sequentially instead of being modified by multiple threads at the same time. This way, the result will be correct and the program will not have any undefined behavior.
+                    For a complete list of atomic operations (add, sub, max, min, xor, ...) that can be used in CUDA, you can refer to the <a href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#atomic-functions">CUDA C Programming Guide</a>.
+                </p>
+                <p>
+                    We have seen so far that the parallel execution of threads can cause race conditions if we modify the same memory location. Atomic operations can be used to avoid this issue by ensuring that the memory location is updated atomically which executes the atomic operations sequentially to avoid undefined behavior. Nevertheless, we want to avoid serialization as much as possible, as it can lead to performance degradation, c.f. <a href="#warp-divergence">the warp divergence section</a>.
+                    The two common ways to reduce the need for atomic operations are to use <mark>privatization</mark> and <mark>aggregation</mark>.
+                    Privatization means that each thread has its own copy of the variable and updates it independently before performing an atomic operation to combine the results. Aggregation means that threads perform multiple operations on the shared memory before performing an atomic operation to combine the results, e.g. we could sum up the values in shared memory for a subset of the input array before performing an atomic add operation. This would greatly reduce the number of atomic operations needed and thus make our code faster.
+                </p>
             </div>
         </div>
         <hr style="width:60%;">
