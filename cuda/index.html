@@ -61,6 +61,11 @@
                         <a href="#warp-divergence">5. Warp divergence and SIMD</a><br>
                         <a href="#coalesced-memory">6. Coalesced memory access</a><br>
                         <a href="#example-matrix-multiplication">7. Example: Matrix multiplication</a><br>
+                            &emsp;<a href="#example-matrix-multiplication-sequential">7.1 Sequential C++ implementation</a><br>
+                            &emsp;<a href="#example-matrix-multiplication-naive">7.2 Naive CUDA implementation</a><br>
+                            &emsp;<a href="#example-matrix-multiplication-tiled">7.3 Tiled CUDA implementation</a><br>
+                            &emsp;<a href="#example-matrix-multiplication-roofline">7.4 Roofline analysis</a><br>
+                            &emsp;<a href="#example-matrix-multiplication-optimizations">7.5 Optimizations</a><br>
                         <a href="#race-condition">8. Race condition and atomic operations</a><br>
                         <a href="#example-flash-attention">9. Example: Flash attention</a><br>
                         <a href="#useful-resources">10. Useful resources</a></li>
@@ -497,7 +502,53 @@
         <div class="row">
             <div class="col-md-12">
                 <h2 id="example-matrix-multiplication">7. <u>Example:</u> Matrix multiplication</h2>
-                TODO
+                <p>
+                    Matrix multiplication is a common operation in linear algebra and machine learning. The operation involves multiplying two matrices \(A \in \mathbb{R}^{M \times K}\) and \(B \in \mathbb{R}^{K \times N}\) to produce a resulting matrix \(C \in \mathbb{R}^{M \times N}\) where each element \(C_{i,j}\) is the dot product of the \(i\)-th row of \(A\) and the \(j\)-th column of \(B\), i.e.
+                    \[
+                        C_{i,j} = \sum_{k=1}^{K} A_{i,k} B_{k,j}.
+                    \]
+                </p>
+                <p>Work in progress... (TODO)</p>
+                <!-- <h3 id="example-matrix-multiplication-sequential">7.1 Sequential C++ implementation
+                    <a href="https://colab.research.google.com/drive/15pw0WxLbzauBAKqd4OdQpUVS9j1drVzb?usp=sharing" class="btn btn-primary" target="_blank">
+                        <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                        Code
+                    </a>
+                </h3>
+                <p>
+                    The sequential C++ implementation of matrix multiplication is straightforward and involves three nested loops to iterate over the rows and columns of the resulting matrix \(C\). The following code snippet shows the sequential C++ implementation of matrix multiplication:
+                </p>
+                <pre>
+                    <code class="language-c">
+                        void matrix_multiply(int M, int K, int N, float *A, float *B, float *C)
+                        {
+                            for (int i = 0; i < M; i++)
+                                for (int j = 0; j < N; j++)
+                                    for (int k = 0; k < K; k++)
+                                        C[i * N + j] += A[i * K + k] * B[k * N + j];
+                        }</code>
+                </pre>
+                <p>
+                    The inner loop calculates the dot product of the \(i\)-th row of \(A\) and the \(j\)-th column of \(B\) and stores the result in the \(i,j\)-th element of the resulting matrix \(C\). The outer loops iterate over the rows and columns of the resulting matrix \(C\).
+                    The realization in code can be explained at the following diagram:
+                </p>
+                <p>TODO</p>
+                <h3 id="example-matrix-multiplication-naive">7.2 Naive CUDA implementation
+                    <a href="https://colab.research.google.com/drive/15pw0WxLbzauBAKqd4OdQpUVS9j1drVzb?usp=sharing" class="btn btn-primary" target="_blank">
+                        <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                        Code
+                    </a>
+                </h3><p>TODO</p>
+                <h3 id="example-matrix-multiplication-tiled">7.3 Tiled CUDA implementation
+                    <a href="https://colab.research.google.com/drive/15pw0WxLbzauBAKqd4OdQpUVS9j1drVzb?usp=sharing" class="btn btn-primary" target="_blank">
+                        <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
+                        Code
+                    </a>
+                </h3><p>TODO</p>
+                <h3 id="example-matrix-multiplication-roofline">7.4 Roofline analysis
+                </h3><p>TODO</p>
+                <h3 id="example-matrix-multiplication-optimizations">7.5 Optimizations</h3>
+                <p>TODO</p> -->
             </div>
         </div>
         <hr style="width:60%;">
