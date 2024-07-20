@@ -534,12 +534,33 @@
                 </p>
                 <img src="MatrixMultiplication.svg" alt="Matrix Multiplication Diagram"  class="mx-auto d-block"><br>
                 <h3 id="example-matrix-multiplication-naive">7.2 Naive CUDA implementation
-                    <a href="https://colab.research.google.com/drive/15pw0WxLbzauBAKqd4OdQpUVS9j1drVzb?usp=sharing" class="btn btn-primary" target="_blank">
+                    <a href="https://colab.research.google.com/drive/1StdzP1mbjGE8hiqjSFIewY2aWTOi_iIm?usp=sharing" class="btn btn-primary" target="_blank">
                         <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
                         Code
                     </a>
                 </h3>
-                <p>Work in progress... (TODO)</p>
+                <p>
+                    The naive CUDA implementation of matrix multiplication involves launching a CUDA kernel to perform the matrix multiplication on the GPU. The CUDA kernel is executed by multiple threads in parallel, with each thread calculating a single element of the resulting matrix \(C\). The following code snippet shows the naive CUDA implementation of matrix multiplication:
+                </p>
+                <pre>
+                    <code class="language-c">
+                        __global__ void matrix_multiply(int M, int K, int N, float *A, float *B, float *C)
+                        {
+                            int i = blockIdx.x * blockDim.x + threadIdx.x;
+                            int j = blockIdx.y * blockDim.y + threadIdx.y;
+                            if (i < M && j < N)
+                            {
+                                float sum = 0.0f;
+                                for (int k = 0; k < K; k++)
+                                    sum += A[i * K + k] * B[k * N + j];
+                                C[i * N + j] = sum;
+                            }
+                        }</code>
+                </pre>
+                <p>
+                    The major difference to the sequential code is that we now launch multiple threads simultaneously to calculate a \(BLOCK\_SIZE \times BLOCK\_SIZE\) block of the resulting matrix \(C\). The CUDA kernel is executed by multiple threads in parallel, with each thread calculating a single element of the resulting matrix \(C\). The outer loops are replaced by the block and thread indices, which are used to calculate the row and column of the resulting matrix \(C\). This can be visualized in the following diagram:
+                </p>
+                <img src="MatrixMultiplicationCUDA.svg" alt="Matrix Multiplication CUDA Diagram"  class="mx-auto d-block"><br>
                 <!-- <h3 id="example-matrix-multiplication-tiled">7.3 Tiled CUDA implementation
                     <a href="https://colab.research.google.com/drive/15pw0WxLbzauBAKqd4OdQpUVS9j1drVzb?usp=sharing" class="btn btn-primary" target="_blank">
                         <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
