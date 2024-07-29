@@ -561,13 +561,70 @@
                     The major difference to the sequential code is that we now launch multiple threads simultaneously to calculate a \(BLOCK\_SIZE \times BLOCK\_SIZE\) block of the resulting matrix \(C\). The CUDA kernel is executed by multiple threads in parallel, with each thread calculating a single element of the resulting matrix \(C\). The outer loops are replaced by the block and thread indices, which are used to calculate the row and column of the resulting matrix \(C\). This can be visualized in the following diagram:
                 </p>
                 <img src="MatrixMultiplicationCUDA.svg" alt="Matrix Multiplication CUDA Diagram"  class="mx-auto d-block"><br>
-                <!-- <h3 id="example-matrix-multiplication-tiled">7.3 Tiled CUDA implementation
+                <h3 id="example-matrix-multiplication-tiled">7.3 Tiled CUDA implementation
                     <a href="https://colab.research.google.com/drive/15pw0WxLbzauBAKqd4OdQpUVS9j1drVzb?usp=sharing" class="btn btn-primary" target="_blank">
                         <img src="Colab.svg" alt="Colab Logo" style="height:20px;">
                         Code
                     </a>
-                </h3><p>TODO</p>
-                <h3 id="example-matrix-multiplication-roofline">7.4 Roofline analysis
+                </h3>
+                <p>
+                    We can still greatly improve the performance of the matrix multiplication kernel in CUDA.
+                    To achieve this, we can use <mark>tiling</mark> and <mark>shared memory</mark> to reduce the number of global memory accesses and improve the memory access pattern.
+                    The idea is to load a tile of the matrices \(A\) and \(B\) into shared memory, perform the matrix multiplication on the tile, and then write the result back to global memory.
+                    This way, we can take advantage of the fast shared memory and coalesced memory access to improve the performance of the matrix multiplication kernel.
+                    The following code snippet shows the tiled CUDA implementation of matrix multiplication:
+                </p>
+                <pre>
+                    <code class="language-c">
+                        __global__ void matrix_multiply_tiled(int M, int K, int N, float *A, float *B, float *C)
+                        {
+                            __shared__ float As[TILE_WIDTH][TILE_WIDTH];
+                            __shared__ float Bs[TILE_WIDTH][TILE_WIDTH];
+
+                            int bx = blockIdx.x;
+                            int by = blockIdx.y;
+                            int tx = threadIdx.x;
+                            int ty = threadIdx.y;
+                            int row = by * TILE_WIDTH + ty;
+                            int col = bx * TILE_WIDTH + tx;
+
+                            float value = 0.0f;
+                            for (int m = 0; m < (K + TILE_WIDTH - 1) / TILE_WIDTH; m++)
+                            {
+                                // load matrix tiles into shared memory
+                                if (m * TILE_WIDTH + tx < K && row < M)
+                                    As[ty][tx] = A[row * K + m * TILE_WIDTH + tx];
+                                else
+                                    As[ty][tx] = 0.0f;
+                                if (m * TILE_WIDTH + ty < K && col < N)
+                                    Bs[ty][tx] = B[(m * TILE_WIDTH + ty) * N + col];
+                                else
+                                    Bs[ty][tx] = 0.0f;
+                                __syncthreads();
+
+                                // multiply matrix tiles and accumulate result
+                                for (int k = 0; k < TILE_WIDTH; k++)
+                                    value += As[ty][k] * Bs[k][tx];
+                                __syncthreads();
+                            }
+
+                            // write result to global memory
+                            if (row < M && col < N)
+                                C[row * N + col] = value;
+                        }</code>
+                </pre>
+                <p>
+                    In more detail, we want to fill the shared memory arrays <code>As</code> and <code>Bs</code> with the tiles of the matrices \(A\) and \(B\), respectively. Here, the qualifier <code>__shared__</code> is used to allocate shared memory for the arrays. 
+                    Recall that shared memory is fast on-chip memory that is shared by all threads in a block. The size of the shared memory arrays is defined by the constant <code>TILE_WIDTH</code>, which is the size of the tile.
+                    After defining some helper variables, the matrix multiplication consists of three main parts: loading the tiles into shared memory, performing the matrix multiplication on the tiles and then distributing the result back to the global memory.
+                    An important aspect of the tiled CUDA implementation is the use of the <code>__syncthreads()</code> function, which synchronizes all threads in the block. This ensures that all threads have finished loading the tiles into shared memory before proceeding to the matrix multiplication.
+                    Similarly, we use <code>__syncthreads()</code> to ensure that all threads have finished the (tiled) matrix multiplication before writing the result back to the global memory.
+                </p>
+                <p>
+                    This can be visualized in the following diagram:
+                </p>
+                <img src="TiledMatrixMultiplication.svg" alt="Tiled Matrix Multiplication CUDA Diagram"  class="mx-auto d-block"><br>
+                <!-- <h3 id="example-matrix-multiplication-roofline">7.4 Roofline analysis
                 </h3><p>TODO</p>
                 <h3 id="example-matrix-multiplication-optimizations">7.5 Optimizations</h3>
                 <p>TODO</p> -->
