@@ -624,10 +624,25 @@
                     This can be visualized in the following diagram:
                 </p>
                 <img src="TiledMatrixMultiplication.svg" alt="Tiled Matrix Multiplication CUDA Diagram"  class="mx-auto d-block"><br>
-                <!-- <h3 id="example-matrix-multiplication-roofline">7.4 Roofline analysis
-                </h3><p>TODO</p>
+                <h3 id="example-matrix-multiplication-roofline">7.4 Roofline analysis
+                </h3>
+                <p>
+                    Thus far, we have only considered the performance of our CUDA kernels in terms of wall time. However, to get a more comprehensive understanding of the performance of the kernels, we can use <mark><a href="https://crd.lbl.gov/assets/Uploads/ECP20-Roofline-1-intro.pdf">roofline analysis</a></mark>.
+                    The main question when performing CUDA kernel optimizations is how close we are to the theoretical peak performance of the GPU. 
+                    Since matrix multiplication is performance critical for deep learning and scientific computing, there already exists highly optimized libraries like <a href="https://developer.nvidia.com/cublas">cuBLAS</a> (NVIDIA's matrix library) and newer GPUs have tensor cores which are specifically made to for tensor multiplication.
+                    One way to verify the performance of our CUDA kernels is to compare them to the performance of cuBLAS. But how we would do it more generlly when we do not have an optimized library code to compare against?
+                </p>
+                <p>
+                    To calculate the the theoretical maximal performance (by NVIDIA so called "speed of light"), we need to determine how fast we can move the data and how fast we can perform the computation. This can be graphically represented in a so-called <mark>roofline plot</mark> where the x-axis represents the arithmetic intensity in FLOPs per byte and the y-axis represents the performance in FLOPs per second.
+                    The roofline plot is divided into two regions: the <mark>compute bound</mark> region and the <mark>memory bound</mark>  region. The compute bound region is where the performance is limited by the computational resources of the GPU, while the memory bound region is where the performance is limited by the memory bandwidth of the GPU.
+                    The roofline plot can help us determine whether our CUDA kernels are compute bound or memory bound and how close they are to the theoretical peak performance of the GPU.
+                    This can be visualized in the following diagram:
+                </p>
+                <img src="Roofline.svg" alt="Roofline Diagram"  class="mx-auto d-block" style="width: 60%;"><br>
+                <!-- TODO: Do roofline analysis for matrix multiplication, explain how one can fix memory bound & compute bound kernels -->
                 <h3 id="example-matrix-multiplication-optimizations">7.5 Optimizations</h3>
-                <p>TODO</p> -->
+                <!-- <p>TODO: tile/wave quantization, performance checklist</p> -->
+                For further details and options for performance optimization of matrix-matrix multiplication using CUDA, we refer to the step-by-step blog posts <a href="https://siboehm.com/articles/22/CUDA-MMM">How to Optimize a CUDA Matmul Kernel for cuBLAS-like Performance: a Worklog</a> by Simon Boehm from the performance team of Anthropic and <a href="https://leimao.github.io/article/CUDA-Matrix-Multiplication-Optimization/">CUDA Matrix Multiplication Optimization</a> by Lei Mao - a Senior Deep Learning Systems Engineer at NVIDIA.
             </div>
         </div>
         <hr style="width:60%;">
