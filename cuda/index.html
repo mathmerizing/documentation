@@ -639,7 +639,46 @@
                     This can be visualized in the following diagram:
                 </p>
                 <img src="Roofline.svg" alt="Roofline Diagram"  class="mx-auto d-block" style="width: 60%;"><br>
-                <!-- TODO: Do roofline analysis for matrix multiplication, explain how one can fix memory bound & compute bound kernels -->
+                <p>
+                    For the roofline analysis, we now need to calculate the arithmetic intensity of the matrix multiplication operation. The <mark>arithmetic intensity</mark> is defined as the number of floating-point operations (FLOPs) per byte of data moved between the (global) memory and the processor. We need to multiply the \(M \times K\) - sized matrix \(A\) with the \(K \times N\) - sized matrix \(B\). For each element in the resulting \(M \times N\) - sized matrix \(C\), we need to perform \(K\) multiplications and \(K\) additions. This results in a total of \(2 MNK\) FLOPs.
+                    The total amount of data moved (read and write) between the global memory and the processor is the sum of the sizes of the matrices \(A\), \(B\), and \(C\), which is \(M K + K N + M N\) floats. The arithmetic intensity is then given by:
+                    \[
+                        \text{Arithmetic Intensity} = \frac{2 M N K}{2 (M K + K N + M N)}.
+                    \]
+                    Whether matrix multiplication is compute or memory bound now depends on the matrix sizes (\(M, N, K\)) and the peak throughput of the GPU.
+                    Following the calculations on <a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html#math-mem">NVIDIA Docs Hub</a>, the NVIDIA V100 GPU has a peak throughput of \(138.9\) FLOP / Byte loading from GPU's memory. For \(M = K = 8192, N = 128\), the arithmetic intensity is \(124.1\) FLOP / Byte, which is smaller than the peak throughput of the GPU, i.e. the matrix multiplication is memory bound. For \(M = K = N = 8192\), the arithmetic intensity is \(2731\) FLOP / Byte, which is larger than the peak throughput of the GPU, i.e. the matrix multiplication is compute bound.
+                </p>
+                <p>
+                    Here you can experiment with different matrix sizes: <br>
+                    <script>
+                        function calculate() {
+                        var M = document.getElementById('M').value;
+                        var N = document.getElementById('N').value;
+                        var K = document.getElementById('K').value;
+                        var arithmeticIntensity = (2 * M * N * K) / (2 * (M * K + K * N + M * N));
+                        var peakThroughput = 138.9;
+                        var result = arithmeticIntensity < peakThroughput ? "Memory Bound" : "Compute Bound";
+                        document.getElementById('result').innerText = "Arithmetic Intensity: " + arithmeticIntensity.toFixed(2) + " FLOP / Byte\n" + "The algorithm is " + result + ".";
+                        document.getElementById('M-value').innerText = " Value: " + M;
+                        document.getElementById('N-value').innerText = " Value: " + N;
+                        document.getElementById('K-value').innerText = " Value: " + K;
+                        }
+                    </script>
+                        
+                    M: <input type="range" min="1" max="8192" value="1" id="M" oninput="calculate()"><span id="M-value"></span><br>
+                    N: <input type="range" min="1" max="8192" value="1" id="N" oninput="calculate()"><span id="N-value"></span><br>
+                    K: <input type="range" min="1" max="8192" value="1" id="K" oninput="calculate()"><span id="K-value"></span><br>
+                    <p id="result"></p>
+                </p>
+                <p>
+                    How can I fix CUDA kernels that are memory or compute bound? <br>
+                    <ul>
+                        <li>Memory bound: <mark>fuse</mark> (combine multiple ops in one kernel, e.g. \(f(g(x))\) instead of \(y = g(x), z = f(y)\)), <mark>quantize</mark> (less precision), compile</li>
+                        <li>Compute bound: write better algorithm (e.g. <a href=" 	
+                            https://doi.org/10.48550/arXiv.1805.02867">online normalizer for SoftMax</a>)</li>
+                    </ul>
+                </p>
+                <!-- TODO: explain how one can fix memory bound & compute bound kernels -->
                 <h3 id="example-matrix-multiplication-optimizations">7.5 Optimizations</h3>
                 <!-- <p>TODO: tile/wave quantization, performance checklist</p> -->
                 For further details and options for performance optimization of matrix-matrix multiplication using CUDA, we refer to the step-by-step blog posts <a href="https://siboehm.com/articles/22/CUDA-MMM">How to Optimize a CUDA Matmul Kernel for cuBLAS-like Performance: a Worklog</a> by Simon Boehm from the performance team of Anthropic and <a href="https://leimao.github.io/article/CUDA-Matrix-Multiplication-Optimization/">CUDA Matrix Multiplication Optimization</a> by Lei Mao - a Senior Deep Learning Systems Engineer at NVIDIA.
