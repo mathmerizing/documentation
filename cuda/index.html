@@ -678,10 +678,65 @@
                             https://doi.org/10.48550/arXiv.1805.02867">online normalizer for SoftMax</a>)</li>
                     </ul>
                 </p>
-                <!-- TODO: explain how one can fix memory bound & compute bound kernels -->
                 <h3 id="example-matrix-multiplication-optimizations">7.5 Optimizations</h3>
+                <p>
+                    We have discussed in this section how we can implement a matrix-matrix multiplication in CUDA and how using tiling and shared memory can speed up the kernel by using better memory access patterns and the GPU's cache hierarchy.
+                    Furthermore, we have described how to figure out whether an algorithm is memory or compute bound.
+                    What are some other performance bottlenecks that we might encounter for matrix-matrix multiplication and what are some general steps to improve the performance of a CUDA kernel?
+                </p>
+                <p>
+                    A common issue with matrix multiplication or matrix operations in general is <mark>tile quantization</mark>. Tile quantization happens when the matrix dimension is not divisible by the tile size. This causes some threads to run idle because they are processing a tile that consists mostly of padding (zero entries). To avoid tile quantization, we can make the dimensions divisible by the tile size or at least choose a tile size that only has a small amount of padding. Tile quantization can be visualized at the following example:
+                </p>
+                <img src="TileQuantization.svg" alt="Tile Quantization Diagram"  class="mx-auto d-block" style="width: 40%;"><br>
+                <p>
+                    Another common issue found in matrix multiplication is <mark>wave quantization</mark>. Herein, the total number of tiles is not divisible by the number of streaming multiprocessors (SMs) in the GPU. This causes some SMs to run idle in the last wave because they are not processing any tiles. To avoid wave quantization, we can make the number of tiles divisible by the number of SMs or at least choose a number of tiles that only has a small amount of idle SMs. We observe that we can limit the effects of tile quantization and wave quantization by choosing the tile size carefully for our given matrices and GPU.
+                </p>
+                <p>
+                    Finally, we list some general steps to improve the performance of a CUDA kernel based on a <a href="https://www.youtube.com/watch?v=SGhfUhlowB4">YouTube lecture by Mark Saroufim</a>:
+                    <ul>
+                        <li>
+                            <a href="#coalesced-memory">Coalesced global memory access</a>
+                        </li>
+                        <li>
+                            Maxmimize occupancy (best block & grid size?)
+                        </li>
+                        <li>
+                            Understand if memory or compute bound
+                        </li>
+                        <li>
+                            Minimize control divergence (threads in same warp should do similar work)
+                        </li>
+                        <li>
+                            Minimize atomic operations
+                        </li>
+                        <li>
+                            Tiling of reused data and use shared memory
+                        </li>
+                        <li>
+                            Use vectorized instructions (e.g. float4) and quantization
+                        </li>
+                        <li>
+                            Use fast math / CUDA library functions
+                        </li>   
+                        <li>
+                            Privatization and aggregation (local copies of data and combine mutliple operations to avoid going to global memory often)
+                        </li>
+                        <li>
+                            Use constant memory for read-only data
+                        </li>
+                        <li>
+                            Thread coarsening (do more work per thread)
+                        </li>
+                        <li>
+                            Rewrite algorithm using better math
+                        </li>
+                    </ul>
+                </p>
+
                 <!-- <p>TODO: tile/wave quantization, performance checklist</p> -->
-                For further details and options for performance optimization of matrix-matrix multiplication using CUDA, we refer to the step-by-step blog posts <a href="https://siboehm.com/articles/22/CUDA-MMM">How to Optimize a CUDA Matmul Kernel for cuBLAS-like Performance: a Worklog</a> by Simon Boehm from the performance team of Anthropic and <a href="https://leimao.github.io/article/CUDA-Matrix-Multiplication-Optimization/">CUDA Matrix Multiplication Optimization</a> by Lei Mao - a Senior Deep Learning Systems Engineer at NVIDIA.
+                <p>
+                    For further details and options for performance optimization of matrix-matrix multiplication using CUDA, we refer to the step-by-step blog posts <a href="https://siboehm.com/articles/22/CUDA-MMM">How to Optimize a CUDA Matmul Kernel for cuBLAS-like Performance: a Worklog</a> by Simon Boehm from the performance team of Anthropic and <a href="https://leimao.github.io/article/CUDA-Matrix-Multiplication-Optimization/">CUDA Matrix Multiplication Optimization</a> by Lei Mao - a Senior Deep Learning Systems Engineer at NVIDIA.
+                </p>
             </div>
         </div>
         <hr style="width:60%;">
