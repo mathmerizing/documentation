@@ -675,7 +675,7 @@
                     <ul>
                         <li>Memory bound: <mark>fuse</mark> (combine multiple ops in one kernel, e.g. \(f(g(x))\) instead of \(y = g(x), z = f(y)\)), <mark>quantize</mark> (less precision), compile</li>
                         <li>Compute bound: write better algorithm (e.g. <a href=" 	
-                            https://doi.org/10.48550/arXiv.1805.02867">online normalizer for SoftMax</a>)</li>
+                            https://doi.org/10.48550/arXiv.1805.02867">online normalizer for softmax</a>)</li>
                     </ul>
                 </p>
                 <h3 id="example-matrix-multiplication-optimizations">7.5 Optimizations</h3>
@@ -788,7 +788,58 @@
         <div class="row">
             <div class="col-md-12">
                 <h2 id="example-flash-attention">9. <u>Example:</u> Flash attention</h2>
-                TODO
+                <p>
+                    Machine translation has been revolutionized by the introduction of the <a href="https://arxiv.org/abs/1706.03762">transformer architecture (Vaswani et al, 2017) </a>, which uses self-attention mechanisms to model the relationships between words in a sentence. The transformer architecture has become the de facto standard for many natural language processing tasks, including machine translation, text summarization, and question-answering systems. Additionally, the transformer architecture has been adapted for image recognition tasks, such as image classification and object detection.
+                </p>
+                <p>
+                    <img src="Transformer.png" alt="Transformer Diagram"  class="mx-auto d-block" style="width: 30%;"><br>
+                    <center>
+                        Image source: Transformer paper (<a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a>)
+                    </center>
+                </p>
+                <p>
+                    A major bottleneck in training transformer models is the self-attention mechanism, which requires computing the dot product of the query, key, and value vectors for each token in the input sequence. It is easy to see how this operation is computationally expensive, since for each token in the input sequence, we need to compute the dot product with every other token in the sequence. This results in a quadratic complexity, which can be prohibitive for long input sequences.
+                    There are some approaches that have been proposed to reduce the computational complexity of the self-attention mechanism from quadratic to linear, but they often come with a trade-off in terms of model performance since they approximate the full self-attention mechanism.
+                </p>
+                <p>
+                    To avoid the quadratic complexity of the self-attention mechanism and the approximations made by the linear complexity methods, we can use the <mark>flash attention</mark> mechanism proposed by <a href="https://arxiv.org/abs/2205.14135">Dao et al. (2022)</a>. 
+                    Similar to our dicussion of <a href="#example-matrix-multiplication"> matrix-matrix multiplication</a>, flash attention is a GPU-aware algorithm that leverages the parallelism of GPUs to accelerate the self-attention mechanism. To achieve this it uses tools like tiling or kernel fusion to reduce the computational complexity.
+                </p>
+                <p>
+                    <img src="FlashAttention.png" alt="Flash Attention Diagram"  class="mx-auto d-block" style="width: 60%;"><br>
+                    <center>
+                        Image source: FlashAttention paper (<a href="https://arxiv.org/abs/2205.14135">https://arxiv.org/abs/2205.14135</a>)
+                    </center>
+                </p>
+                <p>
+                    Let us divide deeper into the technical details of the attention mechanism. For query, key and value matrices \(Q, K, V \in \mathbb{R}^{N \times d}\) with sequence length \(N\) and embedding dimension \(d\), the attention mechanism is defined as:
+                    \[
+                        \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d}}\right)V.
+                    \]
+                    Naively, one would load and store each computation separately, i.e. first load \(Q\) and \(K\), then compute the dot product \(S = \frac{QK^T}{\sqrt{d}}\) and store it in memory.
+                    Then load \(S\) from memory, compute the softmax \(P = \text{softmax}(S)\) and store it in memory.
+                    Finally, load \(P\) and \(V\), perform the matrix multiplication  \(O = PV\) and store it in memory.
+                </p>
+                <p>
+                    In the flash attention paper the authors introduce the following optimizations:
+                    <ul>
+                        <li>
+                            <mark>Kernel fusion</mark>: Instead of loading and storing each computation separately, the authors fuse the computations into a single kernel. This reduces the number of memory accesses and improves the performance of the attention mechanism.
+                        </li>
+                        <li>
+                            <mark>Tiling</mark>: The attention is being computed by blocks, cf. <a href="#example-matrix-multiplication-tiled">tiled matrix multiplication</a>. The matrix multiplication has been already discussed previously and the same principles apply here. It only remains to discuss how the softmax can be computed for tiling. The numerically stable softmax is defined as:
+                            \[
+                                \text{softmax}(x)_i = \frac{e^{x_i - \max_k x_k}}{\sum_{j=1}^{N} e^{x_j - \max_k x_k}}.
+                            \]
+                            To compute the softmax for a tiled implementation, we can use the <a href=" 	
+                            https://doi.org/10.48550/arXiv.1805.02867">online normalizer for softmax</a>, which boils down to computing the maximum value / normalizer for each tile separately and in the end correcting the maximum value when all tiles have been processed.
+                        </li>
+                        <li>
+                            <mark>Recomputation</mark>: Generally, we need to store intermediate results for the backward pass, but this would also lead to a quadratic memory complexity. Instead, the authors propose to recompute the intermediate results \(S\) and \(P\) during the backward pass, which reduces the memory requirements.
+                        </li>
+                    </ul>
+                    Overall, the flash attention mechanism improves on the quadratic complexity of the self-attention mechanism by using GPU-aware optimizations such as kernel fusion, tiling, and recomputation to accelerate the attention mechanism. This leads to a reduction in compute time and memory usage, making it more efficient for training transformer models on GPUs.
+                </p>
             </div>
         </div>
     <hr style="width:80%;">
